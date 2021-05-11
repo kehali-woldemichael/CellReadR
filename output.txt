@@ -1,0 +1,10 @@
+RIblast ris result
+input:/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/BioPython/Temp/PlxnD1_01.fasta,database:/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/BioPython/Temp_RIblast/PlxnD1_db,RepeatFlag:0,MaximalSpan:70,MinAccessibleLength:5,MaxSeedLength:20,InteractionEnergyThreshold:-4,HybridEnergyThreshold:-6,FinalThreshold:-8,DropOutLengthWoGap:5,DropOutLengthWGap:16
+Id,Query name, Query Length, Target name, Target Length, Accessibility Energy, Hybridization Energy, Interaction Energy, BasePair
+0,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,5.07216,-13.23,-8.15784,(87-102:4462-4450) 
+1,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,5.67998,-15.11,-9.43002,(12-28:3511-3491) 
+2,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,0.795406,-9.47,-8.67459,(123-130:3454-3447) 
+3,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,4.18113,-12.57,-8.38887,(95-104:3154-3145) 
+4,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,5.23229,-14.02,-8.78771,(86-97:2537-2526) 
+5,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,72.9949,-182.44,-109.445,(0-131:253-122) 
+6,PlxnD1_01 sesRNA #01,204,Plxnd1,5151,50.2435,-94.31,-44.0665,(146-203:107-50) 

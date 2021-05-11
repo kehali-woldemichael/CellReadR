@@ -1,0 +1,1 @@
+IntaRNA -t /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/CDS_Bcl11b.fasta -q /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/BioPython/Temp/Bcl11b_1.fasta --threads 10 --outMode=C

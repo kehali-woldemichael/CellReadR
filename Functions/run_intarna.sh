@@ -1,0 +1,3 @@
+# /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Data/Sequences/Reference/Ensembl/All/Rattus_norvegicus.Rnor_6.0.cdna.all.fa
+# IntaRNA -t /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/CDS_Bcl11b.fasta -q /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/BioPython/Temp/Bcl11b_9.fasta --threads 10 --outMode=C > output.csv
+IntaRNA -t /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Data/Sequences/Reference/NCBI/Rat/GCF_015227675.2_mRatBN7.2_rna.fna -q /home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/BioPython/Temp/Bcl11b_9.fasta --threads 10 --outMode=C > output.csv
