@@ -8,17 +8,18 @@ import os
 from kCellReadR.sequence import *
 
 
+path_RScript = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/kCellReadR/refSeq.R'
+martBase = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
+
 # Loads reference sequences from bsubsequenceiomaRT Output folder
 def load_referenceSequences(geneName, species):
-    martBase = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
     martBasePath = martBase + species
 
     # Generates reference sequence files if necessary
     testPath = martBasePath + '/Reverse_' + geneName + '.fasta'
     if os.path.isfile(testPath) == False:
         # Defining shell command
-        pathScript = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/kCellReadR/refSeq.R'
-        command = 'Rscript ' + pathScript + ' ' + geneName + ' ' + species
+        command = 'Rscript ' + path_RScript + ' ' + geneName + ' ' + species
         # Running shell command
         refSeq = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
 

@@ -1,6 +1,8 @@
 library(biomaRt)
 library(Biostrings)
 
+basePath <- '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
+
 generate_refSeq <- function(geneName, species, typeEnsembl) {
     # Just renaming to ensure that right species found 
     if(species == 'Mouse') {
@@ -9,7 +11,6 @@ generate_refSeq <- function(geneName, species, typeEnsembl) {
         searchName <- species
     }
 
-    basePath <- '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
     totalPath <- paste(basePath, species, '/Reverse_', geneName, '.fasta', sep='')
 
     # Only if does not already exist ... otherwise just extends exists ... resulting in repeats in fasta file
@@ -105,8 +106,7 @@ convert_RNA <- function(arraySeq) {
 # Function for saving Fasta files 
 saveFasta <- function(geneName, species, seq, seqCDS, seqCDNA) {
     #saveBaseName <- paste(getwd(), '/Output/biomaRt/', species, '/', sep = '' )
-    baseName <- '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
-    saveBaseName <- paste(baseName, species, '/', sep='')
+    saveBaseName <- paste(basePath, species, '/', sep='')
     
     # Create Ouput directory if it does not exist in current working directory 
     if(dir.exists("Output") == FALSE) {
