@@ -29,11 +29,12 @@ export class FormGeneDetails extends Component {
                     <AppBar position = "sticky"> 
                         <Toolbar>
                             <Typography>
-                                Enter Gene Details
+                                Automated sesRNA search
                             </Typography>
                         </Toolbar>
                     </AppBar>
                     <br/>
+                    <h1>Enter Gene Details</h1>
                     <TextField 
                         placeholder = "Enter Species Name"
                         // floatingLabelText = "Species Name"

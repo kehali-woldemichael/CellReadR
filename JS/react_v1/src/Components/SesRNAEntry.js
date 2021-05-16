@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import FormGeneDetails from './FormGeneDetails'
 import FormSesRNApar from './FormSesRNApar.js'
-import ConfirmSesRNApar from './ConfirmSesRNApar.js'
+import EnterSequence from './EnterSequence'
+import DisplaysesRNAs from './DisplaysesRNAs'
 
 export class SesRNAEntry extends Component {
     state = {
@@ -61,18 +62,28 @@ export class SesRNAEntry extends Component {
             dist_cTGG, dist_stop_cTGG, choice_ATG }
 
         switch(step) {
-            // Enter gene information 
             case 1: 
                 return (
-                    <FormGeneDetails
+                    <EnterSequence
                         // Props to access next step, handle change, values
                         nextStep = {this.nextStep}
                         handleChange = {this.handleChange}
                         values = {values}
                     />
                 )
-            // Enter sesRNA parameters
+            // Enter gene information 
             case 2: 
+                return (
+                    <FormGeneDetails
+                        // Props to access next step, handle change, values
+                        nextStep = {this.nextStep}
+                        prevStep = {this.prevStep}
+                        handleChange = {this.handleChange}
+                        values = {values}
+                    />
+                )
+            // Enter sesRNA parameters
+            case 3: 
                 return (
                     <FormSesRNApar
                         // Props to access next step, previous step, handle change, values
@@ -83,10 +94,10 @@ export class SesRNAEntry extends Component {
                     />
                 )
             // Confirm sesRNA parameters
-            case 3: 
+            case 4: 
                 return (
                     // Props to access confirm or previous step 
-                    <ConfirmSesRNApar
+                    <DisplaysesRNAs
                         // nextStep = {this.nextStep}
                         prevStep = {this.prevStep}
                         handleChange = {this.handleChange}
