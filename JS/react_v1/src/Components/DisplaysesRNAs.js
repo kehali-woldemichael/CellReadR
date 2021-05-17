@@ -34,7 +34,7 @@ export class Display extends Component {
                 <Grid container item xs={2} direction='column'  alignItems = 'center' justify = 'center'>
                     <MuiThemeProvider>
                         <React.Fragment>
-                            <h1>Sequence Search</h1>
+                            <h2>Sequence Search</h2>
                             <TextField 
                                 inputProps = {{ style: {textAlign: 'center'} }}
                                 placeholder = "Enter splice variant"
@@ -53,7 +53,7 @@ export class Display extends Component {
                                 style = {styles.textbox}
                             />
                             <br/>
-                            <h1>sesRNA Feature Parameters</h1>
+                            <h2>sesRNA Feature Parameters</h2>
                             <br/>
                             <TextField 
                                 inputProps = {{ style: {textAlign: 'center'} }}
