@@ -18,7 +18,10 @@ router.get('/', function(req, res, next) {
  // Collect data from script
  python.stdout.on('data', function (data) {
   console.log('Pipe data from python script ...')
+  console.log(`error:${data}`);
   dataToSend = data.toString();
+//   dataToSend.push(data)
+//   dataToSend = data
  })
 
  // Close child python process 
@@ -27,11 +30,10 @@ router.get('/', function(req, res, next) {
  // Send data to browser
  res.send(dataToSend)
  })
- 
 })
 
 
 // Listen 
-router.listen(port, () => console.log(`Example app listening on port ${port}!`))
+router.listen(port, () => console.log(`DisplaySesRNAs app listening on port ${port}!`))
 
 module.exports = router

@@ -12,12 +12,24 @@ import AppBar from '@material-ui/core/AppBar'
 import { Toolbar } from '@material-ui/core'
 import { Typography } from '@material-ui/core'
 
+import { JsonTable } from "react-json-to-table"
+
+import { DataGrid } from '@material-ui/data-grid'
+
 export class Display extends Component {
     back = e => {
         e.preventDefault()
-        this.props.prevStep();
+        this.props.prevStep()
     }
 
+    fetch_sesRNAs = e => {
+        e.preventDefault()
+        this.props.callAPI_sesRNAs()
+    }
+
+    display_sesRNAs = () => {
+        this.props.render_jsonTable()
+    }
     render() {
         const { values, handleChange} = this.props
 
@@ -114,7 +126,7 @@ export class Display extends Component {
                                 placeholder = "Central TGG minimum distance from center"
                                 //InputLabelProps = "Gene Name"
                                 onChange = {handleChange('dist_cTGG')}
-                                defaultValue={values.dist_cTGG}
+                                defaultValue ={values.dist_cTGG}
                                 style = {styles.textbox}
                             />
                             <br/>
@@ -123,7 +135,7 @@ export class Display extends Component {
                                 placeholder = "Central TGG minimum distance from Stop codon"
                                 //InputLabelProps = "Gene Name"
                                 onChange = {handleChange('dist_stop_cTGG')}
-                                defaultValue={values.dist_stop_cTGG}
+                                defaultValue ={values.dist_stop_cTGG}
                                 style = {styles.textbox}
                             />
                             <br/>
@@ -150,6 +162,7 @@ export class Display extends Component {
                                     style = {styles.button}
                                     color = "secondary"
                                     // onClick = {this.back}
+                                    onClick = {this.fetch_sesRNAs}
                                 >Reload</Button>
                             </ButtonGroup>
                         </React.Fragment>
@@ -159,6 +172,7 @@ export class Display extends Component {
                     <MuiThemeProvider>
                         <h1>Table Candidate sesRNAs</h1>
                         <React.Fragment>
+                            {/* <p>{this.state.sesRNAs_apiResponse}</p>< */}
                             <ButtonGroup>
                                 <Button
                                     label = "Compute higher order features"
@@ -182,6 +196,18 @@ export class Display extends Component {
                                     // onClick = {this.back}
                                 >Download sesRNAs</Button>
                             </ButtonGroup>
+                        {(values.loadingTable_sesRNAs) && <h1>Loading</h1> }
+                        {/* {values.loadedTable_sesRNAs && <JsonTable json={values.sesRNAs_apiResponse} /> } */}
+                        {/* {values.loadedTable_sesRNAs && <JsonTable rows={values.sesRNAs_apiResponse.data} columns={values.sesRNAs_apiResponse.columns} />} */}
+                        {/* {values.loadedTable_sesRNAs && <h1> <JsonToTable rows={values.sesRNAs_apiResponse.data} columns = {values.sesRNAs_apiResponse.columns} /> </h1>} */}
+                        {values.loadedTable_sesRNAs && <h1> {values.sesRNAs_apiResponse.columns[0]} </h1> }
+                        {/* {values.loadedTable_sesRNAs && 
+                            <DataGrid 
+                                rows={values.sesRNAs_apiResponse.data} 
+                                columns={values.sesRNAs_apiResponse.columns} 
+                                rowKey={values.sesRNAs_apiResponse.index}
+                                checkboxSelection 
+                            /> } */}
                         </React.Fragment>
                     </MuiThemeProvider>
                 </Grid>
