@@ -8,8 +8,8 @@ from Bio import SeqIO
 # For creating SeqRecord objects
 from Bio.SeqRecord import SeqRecord
 
-basePath = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/'
-pathToFold = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Packages/ViennaRNA_Python3/usr/lib/python3.9/site-packages/RNA'
+# Importing paths
+from kCellReadR.paths import *
 
 def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
     # Loading RNAfold as RNA
@@ -59,6 +59,7 @@ def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
 def generate_RNApred(sesRNAs_DNA, sequenceMetrics, geneName):
     # Generating Temp
     tempPath = basePath + 'Output/BioPython/Temp'
+    # Creating directory for temp output if does not exist
     pathlib.Path(tempPath).mkdir(parents=True, exist_ok=True)
     # Generating RNA of sesRNA
     sesRNAs_RNA = return_sesRNA_RNA(sesRNAs_DNA)

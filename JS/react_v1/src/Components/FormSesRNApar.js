@@ -27,6 +27,19 @@ export class FormSesRNApar extends Component {
         this.props.prevStep();
     }
 
+    autofill_strict = e => {
+        e.preventDefault()
+        this.props.autofill_strict();
+    }
+    autofill_medium = e => {
+        e.preventDefault()
+        this.props.autofill_medium();
+    }
+    autofill_permissive = e => {
+        e.preventDefault()
+        this.props.autofill_permissive();
+    }
+
     render() {
         const { values, handleChange} = this.props
         // this.props.values
@@ -51,50 +64,25 @@ export class FormSesRNApar extends Component {
                             variant = "contained"
                             style = {styles.button}
                             color = "primary"
-                            // onClick = {this.back}
-                        >Low</Button>
+                            onClick = {this.autofill_permissive}
+                        >Permissive</Button>
                         <Button
-                            label = "Medium"
+                            label = "Intermediate"
                             variant = "contained"
                             style = {styles.button}
                             color = "secondary"
-                            // onClick = {this.back}
-                        >Medium</Button>
+                            onClick = {this.autofill_medium}
+                        >Intermediate</Button>
                         <Button
                             label = "Strict"
                             variant = "contained"
                             style = {styles.button}
                             color = "secondary"
-                            // onClick = {this.back}
+                            onClick = {this.autofill_strict}
                         >Strict</Button>
                     </ButtonGroup>
                     <br/>
-                    <br/>
                     <h2>Manually enter sesRNA parameters</h2>
-                    <h3>Sequence Search</h3>
-                    <InputLabel>Splice Variant</InputLabel>
-                    <TextField 
-                        // InputLabelProps= {{ style: {textAlign: 'left'}}}
-                        inputProps = {{ style: {textAlign: 'center'} }}
-                        placeholder = "1, 2, ..."
-                        // floatingLabelText = "Splice Variant"
-                        onChange = {handleChange('spliceVariant')}
-                        defaultValue={values.spliceVariant}
-                        style = {styles.textbox}
-                    />
-                    <br/>
-                    <InputLabel>Search sequence</InputLabel>
-                    <TextField 
-                        inputProps = {{ style: {textAlign: 'center'} }}
-                        placeholder = "CDS, cDNA"
-                        //InputLabelProps = "Gene Name"
-                        onChange = {handleChange('searchSeq')}
-                        defaultValue={values.searchSeq}
-                        style = {styles.textbox}
-                    />
-                    <br/>
-                    <br/>
-                    <h3>sesRNA Feature Parameters</h3>
                     <br/>
                     <InputLabel>Sequence Direction</InputLabel>
                     <TextField 
@@ -103,6 +91,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('seqDirection')}
                         defaultValue={values.seqDirection}
+                        value={values.seqDirection}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -113,6 +102,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('len_sesRNA')}
                         defaultValue={values.len_sesRNA}
+                        value={values.len_sesRNA}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -123,6 +113,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('minTGG')}
                         defaultValue={values.minTGG}
+                        value={values.minTGG}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -132,6 +123,7 @@ export class FormSesRNApar extends Component {
                         placeholder = "0, 1, 2"
                         onChange = {handleChange('maxStop')}
                         defaultValue={values.maxStop}
+                        value={values.maxStop}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -142,6 +134,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('minGC')}
                         defaultValue={values.minGC}
+                        value={values.minGC}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -152,6 +145,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('maxGC')}
                         defaultValue={values.maxGC}
+                        value={values.maxGC}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -162,6 +156,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('dist_cTGG')}
                         defaultValue={values.dist_cTGG}
+                        value={values.dist_cTGG}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -172,6 +167,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('dist_stop_cTGG')}
                         defaultValue={values.dist_stop_cTGG}
+                        value={values.dist_stop_cTGG}
                         style = {styles.textbox}
                     />
                     <br/>
@@ -182,6 +178,7 @@ export class FormSesRNApar extends Component {
                         //InputLabelProps = "Gene Name"
                         onChange = {handleChange('choice_ATG')}
                         defaultValue={values.choice_ATG}
+                        value={values.choice_ATG}
                         style = {styles.textbox}
                     />
                     <br/>

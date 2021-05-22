@@ -8,8 +8,8 @@ import os
 from kCellReadR.sequence import *
 
 
-path_RScript = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/kCellReadR/refSeq.R'
-martBase = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
+# Importing paths
+from kCellReadR.paths import *
 
 # Loads reference sequences from bsubsequenceiomaRT Output folder
 def load_referenceSequences(geneName, species):

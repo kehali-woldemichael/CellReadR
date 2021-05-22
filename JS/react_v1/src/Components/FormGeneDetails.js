@@ -13,13 +13,125 @@ import { Typography } from '@material-ui/core'
 // import { InputLabel } from '@material-ui/core'
 // import { IconButton } from '@material-ui/core'
 
+import Select from '@material-ui/core/Select'
+import InputLabel from '@material-ui/core/InputLabel'
+import Grid from '@material-ui/core/Grid'
+import Box from '@material-ui/core/Box';
+import MenuItem from '@material-ui/core/MenuItem';
+
+
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core';
+import { sizing } from '@material-ui/system';
+
+
 export class FormGeneDetails extends Component {
     continue = e => {
         e.preventDefault()
         this.props.nextStep()
     }
+
+    sequenceChosen = e => {
+        e.preventDefault()
+        this.props.send_geneDetails()
+        this.props.callAPI_spliceVariants()
+        this.props.chooseGeneDetails()
+    }
+
+
+
     render() {
         const { values, handleChange} = this.props
+        // Function for dislaying after gene and species chosen 
+        const renderVariants = () => {
+            if(values.loading_spliceVariantsInfo) {
+                return <h2>Loading splice variant information ...</h2>
+            }
+            if(values.loaded_spliceVariantsInfo) {
+
+                const num_spliceVariants = (values.spliceVariants_apiResponse[0].length - 1)
+                const array_spliceVariants = Array.from({length: num_spliceVariants}, (_,i) => i + 1)
+
+                const options = []
+                for (let i = 1; i <= num_spliceVariants; i += 1) {options.push(i);}
+
+                return(
+                    <React.Fragment>
+                        <br/>    
+                        <br/>    
+                        <br/>    
+                        <h1>Splice variants</h1>
+                        <Grid container spacing={1} >
+                            <Grid container item xs={12} direction='column'  alignItems = 'center' justify = 'center'>
+                                <Box width="50%" display="flex" flexDirection="column">
+                                    <TableContainer component={Paper} align="center">
+                                        <Table size="small" aria-label="a dense table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell align="center">TranscriptNum</TableCell>
+                                                    <TableCell align="center">TranscriptID</TableCell>
+                                                    <TableCell align="center">TranscriptNum</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            {values.spliceVariants_apiResponse.map((row) => (
+                                                <TableRow key={row.name}>
+                                                    <TableCell align="center">{row[1]}</TableCell>
+                                                    <TableCell align="center">{row.[2]}</TableCell>
+                                                    <TableCell align="center">{row.[3]}</TableCell>
+                                                </TableRow>
+                                                ))}
+                                            <TableBody>
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Box>
+                            </Grid>
+                        </Grid>
+
+                        <br/>    
+                        <h2>Select variant and search sequence</h2>
+                        <Box display="flex" flexDirection="row" p={1} m={1} style={{ width: '100%' }} alignItems="center" justifyContent="center">
+                            <Box p={1}>
+                                <InputLabel htmlFor="age-native-simple">Splice Variant</InputLabel>
+                                <Select native onChange = {handleChange('spliceVariant')} inputinputProps = {{ style: {textAlign: 'center'}} }>
+                                    {options.map(option => (
+                                        <option key={option} value = {option}>
+                                            {option} 
+                                        </option>
+                                    ))}
+                                </Select>
+                            </Box>
+                            <Box p={1}>
+                                <InputLabel htmlFor="age-native-simple">Search seq</InputLabel>
+                                <Select native onChange = {handleChange('searchSeq')} inputinputProps = {{ style: {textAlign: 'center'}} }>
+                                    <option value={'CDS'}>CDS</option>
+                                    <option value={'cDNA'}>cDNA</option>
+                                    ))}
+                                </Select>
+                            </Box>
+                            <Box p={1}>
+                                <Button
+                                    label = "Continue"
+                                    variant = "contained"
+                                    style = {styles.button}
+                                    color = "primary"
+                                    onClick = {this.continue}
+                                >
+                                Continue</Button>
+                            </Box>
+                            <br/>
+                        </Box>
+                    </React.Fragment>
+                )
+            }
+        }
+
         // this.props.values
         // Wrap everything in MuiThemeProvider
         // Change AppBar position later ... will not always display properly .. 
@@ -52,14 +164,15 @@ export class FormGeneDetails extends Component {
                     />
                     <br/>
                     <Button
-                        label = "Continue"
+                        label = "See availible splice variant"
                         variant = "contained"
                         style = {styles.button}
                         color = "secondary"
-                        onClick = {this.continue}
+                        onClick = {this.sequenceChosen}
                     >
-                    Continue
+                    See availible splice variants
                     </Button>
+                    {renderVariants()}
                 </React.Fragment>
             </MuiThemeProvider>
         )
@@ -75,7 +188,8 @@ const styles = {
     },
     button: {
         margin: 15
-    }
+    }, 
 }
+
 
 export default FormGeneDetails

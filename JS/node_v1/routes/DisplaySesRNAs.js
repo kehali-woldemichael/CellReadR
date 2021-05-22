@@ -4,7 +4,7 @@ const express = require('express')
 // const router = express.Router()
 const router = express()
 // Defining output port 
-const port = 9000
+const port = 9001
 
 // Spawn child process 
 const {spawn} = require('child_process')
@@ -13,12 +13,16 @@ router.get('/', function(req, res, next) {
 
  var dataToSend;
  // Spawn new child process to call the python script
- const python = spawn('python', ['test.py'])
+ // Returns information on splice variant given species and gene names 
+ const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/kCellReadR/json_spliceInformation.py'
+ const python = spawn('python', [pyFunction_spliceVariant, 'Rat', 'Bcl11b'])
+//  const python = spawn('python', ['test.py'])
 
  // Collect data from script
  python.stdout.on('data', function (data) {
   console.log('Pipe data from python script ...')
-  console.log(`error:${data}`);
+  console.log('pyFunction_call')
+  console.log(`Data:${data}`);
   dataToSend = data.toString();
 //   dataToSend.push(data)
 //   dataToSend = data

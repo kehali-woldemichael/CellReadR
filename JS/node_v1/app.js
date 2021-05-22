@@ -8,7 +8,8 @@ var logger = require('morgan');
 const cors = require("cors")
 
 // Requiring express to use user defined API/route 
-var displayRouter = require("./routes/DisplaySesRNAs");
+var router_sesRNAs = require("./routes/DisplaySesRNAs")
+var router_spliceVariantInfo = require("./routes/SpliceVariantInfo")
 
 var app = express();
 
@@ -21,12 +22,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json()); //Used to parse JSON bodies
+app.use(express.urlencoded()); //Parse URL-encoded bodies
 
 // For cors 
 app.use(cors())
 
 // Telling express to use user definied route ... 
-app.use("/DisplaySesRNAs", displayRouter);
+app.use("/DisplaySesRNAs", router_sesRNAs)
+app.use("/DisplaySesRNAs", router_spliceVariantInfo)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

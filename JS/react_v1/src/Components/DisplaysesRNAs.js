@@ -28,8 +28,9 @@ export class Display extends Component {
     }
 
     display_sesRNAs = () => {
-        this.props.render_jsonTable()
+        this.props.render_sesRNAs()
     }
+
     render() {
         const { values, handleChange} = this.props
 
@@ -173,29 +174,36 @@ export class Display extends Component {
                         <h1>Table Candidate sesRNAs</h1>
                         <React.Fragment>
                             {/* <p>{this.state.sesRNAs_apiResponse}</p>< */}
-                            <ButtonGroup>
-                                <Button
-                                    label = "Compute higher order features"
-                                    variant = "contained"
-                                    style = {styles.button}
-                                    color = "secondary"
-                                    // onClick = {this.back}
-                                >Toggle View</Button>
-                                <Button
-                                    label = "Compute higher order features"
-                                    variant = "contained"
-                                    style = {styles.button}
-                                    color = "secondary"
-                                    // onClick = {this.back}
-                                >Compute higher order features</Button>
-                                <Button
-                                    label = "Download sesRNAs"
-                                    variant = "contained"
-                                    style = {styles.button}
-                                    color = "secondary"
-                                    // onClick = {this.back}
-                                >Download sesRNAs</Button>
-                            </ButtonGroup>
+                            <Grid container spacing={1} >
+                                <Grid container item xs={12} direction='column'  alignItems = 'center' justify = 'right'>
+                                    <Box width="80%" display="flex" flexDirection="column">
+                                        <ButtonGroup>
+                                            <Button
+                                                label = "Compute higher order features"
+                                                variant = "contained"
+                                                style = {styles.button}
+                                                color = "secondary"
+                                                // onClick = {this.back}
+                                            >Toggle View</Button>
+                                            <Button
+                                                label = "Compute higher order features"
+                                                variant = "contained"
+                                                style = {styles.button}
+                                                color = "secondary"
+                                                // onClick = {this.back}
+                                            >Compute higher order features</Button>
+                                            <Button
+                                                label = "Download sesRNAs"
+                                                variant = "contained"
+                                                style = {styles.button}
+                                                color = "secondary"
+                                                // onClick = {this.back}
+                                            >Download sesRNAs</Button>
+                                        </ButtonGroup>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                            
                         {(values.loadingTable_sesRNAs) && <h1>Loading</h1> }
                         {/* {values.loadedTable_sesRNAs && <JsonTable json={values.sesRNAs_apiResponse} /> } */}
                         {/* {values.loadedTable_sesRNAs && <JsonTable rows={values.sesRNAs_apiResponse.data} columns={values.sesRNAs_apiResponse.columns} />} */}
