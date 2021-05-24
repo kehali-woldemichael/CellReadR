@@ -17,13 +17,16 @@ from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 
 
-def main():
+def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
     """For getting exons ... for portal
     Given species, gene name, and splice variant number 
     Writes exons, cds, and cDNA of each splice variant separately as single fasta file"""
-    speciesName = sys.argv[1]
-    geneName = sys.argv[2]
-    # spliceVariant = int(sys.argv[3])
+
+    # To allow passing parameters either from cli as sys.argv or function paramaters 
+    if speciesName == 'noSpecies' and geneName == 'noGene':
+        speciesName = sys.argv[1]
+        geneName = sys.argv[2]
+        # spliceVariant = int(sys.argv[3])
 
     
     # Get transcript IDs for given gene symbol 
@@ -35,9 +38,10 @@ def main():
     else:
         # id = ensembl_transcriptIDs[spliceVariant]
 
+        save_speciesName = speciesName.replace(" ", "_")
         # Creating directory for ensembl species specific output if does not exist
         # Replaced spaces with _ for naming directories 
-        path_species = path_outputEnsembl + "/" + speciesName.replace(" ", "_")
+        path_species = path_outputEnsembl + "/" + save_speciesName
         pathlib.Path(path_species).mkdir(parents=True, exist_ok=True)
 
         i = 1
@@ -45,9 +49,9 @@ def main():
         # Had to split up ... when only one splice variant returns str ... otherwise returns list
         if type(ensembl_transcriptIDs) != str:
             for id in ensembl_transcriptIDs:
-                outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + speciesName + "_" + id + ".fasta"
-                outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + speciesName + "_" + id + ".fasta"
-                outputName_cdna = path_species + "/" + geneName + "_cdna" + str(i) + "_" + speciesName + "_" + id + ".fasta"
+                outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + save_speciesName + ".fasta"
+                outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + save_speciesName + ".fasta"
+                outputName_cdna = path_species + "/" + geneName + "_cdna_" + str(i) + "_" + save_speciesName + ".fasta"
 
                 # Only proceeds if file does not exist
                 if os.path.isfile(outputName_exons) != True:
@@ -58,7 +62,7 @@ def main():
                     SeqIO.write(exonRecords, outputName_exons, "fasta")
 
                     # Writing cds
-                    if metric_transcript_bioType(id) == 'protein_coding':
+                    if metric_transcript(id)[2] == 'protein_coding':
                         cds = return_ensemblCDS(id, speciesName)
                         cdsRecords = SeqRecord(Seq(cds), id = geneName, description = "cds")
                         SeqIO.write(cdsRecords, outputName_cds, "fasta")
@@ -72,11 +76,12 @@ def main():
                 else:
                     print("Exists")
 
+                
                 i += 1
         else:
-            outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + speciesName + "_" + ensembl_transcriptIDs + ".fasta"
-            outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + speciesName + "_" + ensembl_transcriptIDs + ".fasta"
-            outputName_cdna = path_species + "/" + geneName + "_cdna" + str(i) + "_" + speciesName + "_" + ensembl_transcriptIDs + ".fasta"
+            outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + save_speciesName + ".fasta"
+            outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + save_speciesName + ".fasta"
+            outputName_cdna = path_species + "/" + geneName + "_cdna_" + str(i) + "_" + save_speciesName + ".fasta"
 
             # Only proceeds if file does not exist
             if os.path.isfile(outputName_exons) != True:
@@ -87,7 +92,7 @@ def main():
                 SeqIO.write(exonRecords, outputName_exons, "fasta")
 
                 # Writing cds
-                if metric_transcript_bioType(ensembl_transcriptIDs) == 'protein_coding':
+                if metric_transcript(ensembl_transcriptIDs)[2] == 'protein_coding':
                     cds = return_ensemblCDS(ensembl_transcriptIDs, speciesName)
                     cdsRecords = SeqRecord(Seq(cds), id = geneName, description = "cds")
                     SeqIO.write(cdsRecords, outputName_cds, "fasta")
@@ -102,8 +107,8 @@ def main():
                 print("Exists")
 
     
-def metric_transcript_bioType(transcriptID):
-    """Return biotype of specific splice variant"""
+def metric_transcript(transcriptID):
+    """Returns information on transcript"""
     server = "https://rest.ensembl.org"
     ext = "/lookup/id/" + transcriptID + "?expand=1"
     
@@ -112,31 +117,45 @@ def metric_transcript_bioType(transcriptID):
     if not r.ok:
         r.raise_for_status()
         sys.exit()
- 
-    return r.json()['biotype']
 
-def table_transcripsInfo(ensembl_transcriptIDs):
-    transcriptNum = []
-    transcriptIDs = []
-    transcriptType = []
-    
+    if r.json()['biotype'] != 'protein_coding': 
+        length = 'no protein'
+    else:
+        length = r.json()['Translation']['length'] 
+ 
+    return [r.json()['display_name'], r.json()['assembly_name'], r.json()['biotype'], length, str(bool(r.json()['is_canonical']))]
+
+def table_transcriptsInfo(ensembl_transcriptIDs):
+
+    transcriptInfo = [] 
+
     i = 1
     if type(ensembl_transcriptIDs) != str:
         for transcript in ensembl_transcriptIDs:
-            transcriptNum.append(i)
-            transcriptIDs.append(transcript)
-            transcriptType.append(metric_transcript_bioType(transcript))
+            temp_transcriptInfo = []
+            temp_transcriptInfo.append(i)
+            temp_transcriptInfo.append(transcript)
+            temp_transcriptInfo.extend(metric_transcript(transcript))
+
+            transcriptInfo.append(temp_transcriptInfo)
             i += 1
+
+        transcriptMetrics = \
+                pd.DataFrame(transcriptInfo, columns = 
+                        ['TranscriptNum', 'TranscriptID', 'TranscriptName', 'Assembly', 'Type', 'AA_Length', 'Is_Canonical'])
     else:
-        transcriptNum.append(i)
-        transcriptIDs.append(ensembl_transcriptIDs)
-        transcriptType.append(metric_transcript_bioType(ensembl_transcriptIDs))
+        temp_transcriptInfo = []
+        temp_transcriptInfo.append(i)
+        temp_transcriptInfo.append(ensembl_transcriptIDs)
+        temp_transcriptInfo.extend(metric_transcript(ensembl_transcriptIDs))
+
+        transcriptInfo.append(temp_transcriptInfo)
+        transcriptMetrics = \
+                pd.DataFrame(transcriptInfo, columns = 
+                        ['TranscriptNum', 'TranscriptID', 'TranscriptName', 'Assembly', 'Type', 'AA_Length', 'Is_Canonical'])
     
-    transcriptMetrics = {"TranscriptNum":transcriptNum, "TranscriptID":transcriptIDs, "Type":transcriptType}
 
-
-    # Generating pd.Dataframe
-    return pd.DataFrame(transcriptMetrics)
+    return transcriptMetrics
 
 
 def return_ensemblTranscriptIDs(species, geneSymbol):
@@ -252,7 +271,7 @@ def return_scientificName(speciesName):
 if __name__ == "__main__":
     initialTime = time.perf_counter()
     from paths import *
-    main()
+    download_ensemblSequences()
     print(time.perf_counter() - initialTime)
 if __name__ != "__main__":
     sys.path.append('/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code') 

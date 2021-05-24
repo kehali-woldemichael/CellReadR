@@ -13,7 +13,7 @@ def json_output_spliceVariants():
     # Generating transcriptIDs for gene
     ensembl_transcriptIDs = return_ensemblTranscriptIDs(speciesName, geneName)
     # Generating transcript splice variant metrics 
-    transcriptMetrics = table_transcripsInfo(ensembl_transcriptIDs)
+    transcriptMetrics = table_transcriptsInfo(ensembl_transcriptIDs)
     # Generating pd.Dataframe
     df = pd.DataFrame(transcriptMetrics)
 

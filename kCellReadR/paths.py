@@ -6,3 +6,4 @@ pathToFold = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Proj
 path_RScript = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/kCellReadR/refSeq.R'
 martBase = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/biomaRt/'
 path_speciesEnsembl = "/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Reference/SpeciesEnsembl.csv"
+ensembl_BasePath = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/Output/EnsemblSeq'

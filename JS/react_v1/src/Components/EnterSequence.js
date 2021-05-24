@@ -33,7 +33,7 @@ export class EnterSequence extends Component {
                             </Typography>
                         </Toolbar>
                     </AppBar>
-                    <h1>Enter Sequence</h1>
+                    <h1>Choose method of sequence selection</h1>
                     <Button
                         label = "Continue"
                         variant = "contained"

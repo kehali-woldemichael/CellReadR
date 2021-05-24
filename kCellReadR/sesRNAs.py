@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from kCellReadR.sequence import *
+from kCellReadR.paths import *
 
 # Class to store sesRNA object
 class sesRNA():
@@ -8,6 +9,7 @@ class sesRNA():
     def __init__(self, seq, startSeq, stopSeq,
                  firstTGG, centralTGG, second_cTGG,
                  numTGG, numATG, numStop, gcContent):
+
         self.seq = seq
         self.startSeq = startSeq
         self.stopSeq = stopSeq
@@ -21,10 +23,14 @@ class sesRNA():
 
 class parameters_sesRNA:
     """Class for storing paramaters"""
-    def __init__(self, typeSeq, isoform, length,
+    def __init__(self, species, gene, typeSeq, isoform, length,
                  num_inF_TGG, num_inF_Stop, num_inF_ATG,
                  minGC, maxGC, nearCenter, fromStop):
+        self.species = species
+        self.gene = gene
+
         self.typeSeq = typeSeq
+
         self.isoform = isoform
         self.length = length
         self.num_inF_TGG = num_inF_TGG
@@ -54,7 +60,7 @@ def return_inCDS(sesRNAs, CDS, isoForm, typeSes):
 
     return temp_cds_sesRNAs
 
-def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters):
+def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters, variantTable):
     """Functoion for generating sesRNAs for both complement and reverse
     :rC_Seq: TODO
     :C_Seq: TODO
@@ -64,11 +70,11 @@ def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters):
 
     if parameters.typeSeq == 'Reverse':
         rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
-            generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters)
+            generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters, variantTable)
         return rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs
     elif parameters.typeSeq == 'Complement':
         C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs = \
-            generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters)
+            generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters, variantTable)
         return C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs
     elif parameters.typeSeq == 'Both':
         all_sesRNAs = []
@@ -76,13 +82,13 @@ def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters):
 
         parameters.typeSeq = 'Reverse'
         rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
-            generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters)
+            generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters, variantTable)
         all_sesRNAs.extend(rC_sesRNAs)
         all_sesRNA_objs.extend(rC_sesRNA_objs)
 
         parameters.typeSeq = 'Complement'
         C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs = \
-            generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters)
+            generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters, variantTable)
         all_sesRNAs.extend(C_sesRNAs)
         all_sesRNA_objs.extend(C_sesRNA_objs)
 
@@ -91,7 +97,7 @@ def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters):
         return all_sesRNAs, all_sequenceMetrics, all_sesRNA_objs
 
 
-def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters):
+def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters, variantTable):
     """Returs sesRNAs for all exons"""
     # Empty list for storing
     all_sesRNAs = []
@@ -103,7 +109,7 @@ def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters):
     for i in range(len(exon_records)):
         tempSeq = exon_records[i].seq
         temp_sesRNAs, temp_sequenceMetrics, temp_sesRNA_objs = \
-            generate_sesRNA(tempSeq, searchSequence, parameters, (i+1))
+            generate_sesRNA(tempSeq, searchSequence, parameters, (i+1), variantTable)
 
         # Addiing sesRNAs and cell metrics for this exon
         all_sesRNAs.extend(temp_sesRNAs)
@@ -122,7 +128,7 @@ def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters):
     # Return final output
     return all_sesRNAs, all_sequenceMetrics, all_sesRNA_objs
 
-def generate_sesRNA(sequence, searchSequence, parameters, exonNumber):
+def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTable):
     """Generates sesRNAs given sequence"""
     total = 0
     start = 0
@@ -144,6 +150,10 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber):
     num_inF_TGGs = []
     num_inF_ATGs = []
     num_inF_Stops = []
+
+    # If in exon object 
+    exonTotal_Ratio = []
+    exonProtein_Ratio = []
 
     sesRNA_objs = []
 
@@ -231,6 +241,10 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber):
                 num_inF_ATGs.append(num_inF_ATG)
                 num_inF_Stops.append(num_inF_Stop)
 
+                tempTotal, tempProtein = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable, parameters.typeSeq)
+                exonTotal_Ratio.append(tempTotal)
+                exonProtein_Ratio.append(tempProtein)
+
                 sesRNA_objs.append(sesRNA(subsequence, start, start+length,
                                           indices_inF_TGG[0], central_inF_TGG,
                                           centralTGGs[1], num_inF_TGGs,
@@ -244,7 +258,8 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber):
 
 
 
-    allMetrics = {'TypeSeq': parameters.typeSeq, 'Exon':exonNumber, 'StartSeq':startSeq, 'StopSeq':stopSeq,
+    allMetrics = {'TypeSeq': parameters.typeSeq, 'Exon':exonNumber, "ExonFraction":exonTotal_Ratio, "ExonProteinFrac": exonProtein_Ratio, 
+                  'StartSeq':startSeq, 'StopSeq':stopSeq,
                   'firstTGG': first_TGGs, 'centralTGG': most_centralTGGs,
                   'second_cTGG': second_centralTGGs,
                   'numTGG':num_inF_TGGs, 'numATG':num_inF_ATGs,

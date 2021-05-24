@@ -1,6 +1,9 @@
 # For working with sequence objects
-from Bio.Seq import Seq
 from Bio import SeqIO
+from Bio.Seq import Seq
+# For creating SeqRecord objects
+from Bio.SeqRecord import SeqRecord
+
 # For calling cmd fuctions
 import subprocess
 # For checiking if reference sequecnes exist
@@ -10,36 +13,39 @@ from kCellReadR.sequence import *
 
 # Importing paths
 from kCellReadR.paths import *
+from kCellReadR.ensembl import *
 
 # Loads reference sequences from bsubsequenceiomaRT Output folder
-def load_referenceSequences(geneName, species):
-    martBasePath = martBase + species
+def load_referenceSequences(geneName, species, spliceVariant):
+    """Generates reference sequence files if necessary"""
+    
 
-    # Generates reference sequence files if necessary
-    testPath = martBasePath + '/Reverse_' + geneName + '.fasta'
-    if os.path.isfile(testPath) == False:
-        # Defining shell command
-        command = 'Rscript ' + path_RScript + ' ' + geneName + ' ' + species
-        # Running shell command
-        refSeq = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
+    spliceVariant = str(spliceVariant)
+    save_speciesName = species.replace(" ", "_")
+    # Base path for sequences for gene 
+    gene_BasePath = ensembl_BasePath + '/' + save_speciesName + '/' + geneName 
+    # Path at which to check if sequences downloaded alread 
+    test_BasePath = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    # Only run if sequences not already downloaded 
+    if os.path.isfile(test_BasePath) == False:
+        # Downloading sequences 
+        download_ensemblSequences(species, geneName)
 
-    # Loading sequences for reverse complement gene exons
-    rC_fileName = martBasePath + '/Reverse_' + geneName + '.fasta'
-    rC_exon_records = list(SeqIO.parse(rC_fileName, "fasta"))
-
-    # Loading sequences for complement gene exons
-    C_fileName = martBasePath + '/Complement_' + geneName + '.fasta'
-    C_exon_records = list(SeqIO.parse(C_fileName, "fasta"))
+    # Loading exons file 
+    exon_fileName = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    exon_records = list(SeqIO.parse(exon_fileName, "fasta"))
+    rC_exon_records, C_exon_records = return_Complements(exon_records)
 
     # Loading sequences for gene CDS
-    CDS_fileName = martBasePath + '/CDS_' + geneName + '.fasta'
+    CDS_fileName = gene_BasePath + '_cds_' + spliceVariant + '_' + save_speciesName + '.fasta'
     CDS = list(SeqIO.parse(CDS_fileName, "fasta"))
 
     # Loading sequences for gene CDS
-    cDNA_fileName = martBasePath + '/cDNA_' + geneName + '.fasta'
+    cDNA_fileName = gene_BasePath + '_cdna_' + spliceVariant + '_' + save_speciesName + '.fasta'
     cDNA = list(SeqIO.parse(cDNA_fileName, "fasta"))
 
     return rC_exon_records, C_exon_records, CDS, cDNA
+    
 
 def seq_returnEntrez(sequenceID, retType):
     with Entrez.efetch(

@@ -55,7 +55,7 @@ export class FormGeneDetails extends Component {
             }
             if(values.loaded_spliceVariantsInfo) {
 
-                const num_spliceVariants = (values.spliceVariants_apiResponse[0].length - 1)
+                const num_spliceVariants = values.spliceVariants_apiResponse.length 
                 const array_spliceVariants = Array.from({length: num_spliceVariants}, (_,i) => i + 1)
 
                 const options = []
@@ -65,18 +65,21 @@ export class FormGeneDetails extends Component {
                     <React.Fragment>
                         <br/>    
                         <br/>    
-                        <br/>    
                         <h1>Splice variants</h1>
                         <Grid container spacing={1} >
                             <Grid container item xs={12} direction='column'  alignItems = 'center' justify = 'center'>
-                                <Box width="50%" display="flex" flexDirection="column">
+                                <Box width='20' display="flex" flexDirection="column">
                                     <TableContainer component={Paper} align="center">
                                         <Table size="small" aria-label="a dense table">
                                             <TableHead>
                                                 <TableRow>
                                                     <TableCell align="center">TranscriptNum</TableCell>
                                                     <TableCell align="center">TranscriptID</TableCell>
-                                                    <TableCell align="center">TranscriptNum</TableCell>
+                                                    <TableCell align="center">Name</TableCell>
+                                                    <TableCell align="center">Assembly</TableCell>
+                                                    <TableCell align="center">Type</TableCell>
+                                                    <TableCell align="center">AA_Length</TableCell>
+                                                    <TableCell align="center">Is_Canonical</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             {values.spliceVariants_apiResponse.map((row) => (
@@ -84,6 +87,10 @@ export class FormGeneDetails extends Component {
                                                     <TableCell align="center">{row[1]}</TableCell>
                                                     <TableCell align="center">{row.[2]}</TableCell>
                                                     <TableCell align="center">{row.[3]}</TableCell>
+                                                    <TableCell align="center">{row.[4]}</TableCell>
+                                                    <TableCell align="center">{row.[5]}</TableCell>
+                                                    <TableCell align="center">{row.[6]}</TableCell>
+                                                    <TableCell align="center">{row.[7]}</TableCell>
                                                 </TableRow>
                                                 ))}
                                             <TableBody>
@@ -94,8 +101,10 @@ export class FormGeneDetails extends Component {
                             </Grid>
                         </Grid>
 
+                        <br/>
+                        <br/>
                         <br/>    
-                        <h2>Select variant and search sequence</h2>
+                        <h1>Select variant and search sequence</h1>
                         <Box display="flex" flexDirection="row" p={1} m={1} style={{ width: '100%' }} alignItems="center" justifyContent="center">
                             <Box p={1}>
                                 <InputLabel htmlFor="age-native-simple">Splice Variant</InputLabel>

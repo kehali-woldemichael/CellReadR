@@ -3,8 +3,8 @@ import pathlib
 import os
 import sys
 # For working with sequence objects
-from Bio.Seq import Seq
 from Bio import SeqIO
+from Bio.Seq import Seq
 # For creating SeqRecord objects
 from Bio.SeqRecord import SeqRecord
 
