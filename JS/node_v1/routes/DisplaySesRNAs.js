@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
  var dataToSend;
  // Spawn new child process to call the python script
  // Returns information on splice variant given species and gene names 
- const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code/kCellReadR/json_spliceInformation.py'
+ const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR_Temp/Code/kCellReadR/json_spliceInformation.py'
  const python = spawn('python', [pyFunction_spliceVariant, 'Rat', 'Bcl11b'])
 //  const python = spawn('python', ['test.py'])
 

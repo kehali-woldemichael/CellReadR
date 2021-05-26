@@ -274,6 +274,6 @@ if __name__ == "__main__":
     download_ensemblSequences()
     print(time.perf_counter() - initialTime)
 if __name__ != "__main__":
-    sys.path.append('/home/user1/Dropbox/Research/Neurobiology_PhD/Rotations/Huang/Projects/CellReadR/Code') 
+    sys.path.append('/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR_Temp/Code') 
     from kCellReadR.paths import *
 

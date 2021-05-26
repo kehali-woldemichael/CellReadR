@@ -129,6 +129,7 @@ export class SesRNAEntry extends Component {
         this.setState({ loadingTable_sesRNAs: false } )
         this.setState({ loadedTable_sesRNAs: true } )
     }
+
     callAPI_spliceVariants = async() => {
         this.setState({ loading_spliceVariantsInfo: true } )
 
@@ -136,6 +137,7 @@ export class SesRNAEntry extends Component {
 
         const response = await fetch(url)
         const data = await response.json()
+        console.log(data)
 
         this.setState({ spliceVariants_apiResponse: data } )
 
@@ -145,10 +147,29 @@ export class SesRNAEntry extends Component {
 
     send_geneDetails = async() => {
         const url = "http://localhost:9000/POST"
-            // POST request using axios with async/await
-            const geneDetails = { gene: this.state.gene };
-            const response = await axios.post(url, geneDetails);
-            // this.setState({ articleId: response.data.id });
+        // POST request using axios with async/await
+        const geneDetails = { gene: this.state.gene }
+        // const geneDetails = { gene: 'Fezf2' }
+        console.log(geneDetails)
+
+        // const response = await axios.get(url)
+        const response = await axios.post(url, geneDetails)
+        // const response = await fetch(url, {
+        //     method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //     mode: 'cors', // no-cors, *cors, same-origin
+        //     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        //     credentials: 'same-origin', // include, *same-origin, omit
+        //     headers: {
+        //       'Content-Type': 'application/json'
+        //       // 'Content-Type': 'application/x-www-form-urlencoded',
+        //     },
+        //     redirect: 'follow', // manual, *follow, error
+        //     referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        //     body: JSON.stringify(geneDetails) // body data type must match "Content-Type" header
+        //   });
+        
+        console.log(response)
+        // this.setState({ articleId: response.data.id });
     };
 
 

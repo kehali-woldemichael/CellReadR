@@ -45,7 +45,6 @@ export class FormGeneDetails extends Component {
     }
 
 
-
     render() {
         const { values, handleChange} = this.props
         // Function for dislaying after gene and species chosen 
