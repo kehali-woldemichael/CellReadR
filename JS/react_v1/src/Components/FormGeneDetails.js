@@ -39,7 +39,6 @@ export class FormGeneDetails extends Component {
 
     sequenceChosen = e => {
         e.preventDefault()
-        this.props.send_geneDetails()
         this.props.callAPI_spliceVariants()
         this.props.chooseGeneDetails()
     }
@@ -54,7 +53,7 @@ export class FormGeneDetails extends Component {
             }
             if(values.loaded_spliceVariantsInfo) {
 
-                const num_spliceVariants = values.spliceVariants_apiResponse.length 
+                const num_spliceVariants = values.spliceVariants_apiResponse.data.length 
                 const array_spliceVariants = Array.from({length: num_spliceVariants}, (_,i) => i + 1)
 
                 const options = []
@@ -81,7 +80,7 @@ export class FormGeneDetails extends Component {
                                                     <TableCell align="center">Is_Canonical</TableCell>
                                                 </TableRow>
                                             </TableHead>
-                                            {values.spliceVariants_apiResponse.map((row) => (
+                                            {values.spliceVariants_apiResponse.data.map((row) => (
                                                 <TableRow key={row.name}>
                                                     <TableCell align="center">{row[1]}</TableCell>
                                                     <TableCell align="center">{row.[2]}</TableCell>

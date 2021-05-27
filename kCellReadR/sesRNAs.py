@@ -23,19 +23,19 @@ class sesRNA():
 
 class parameters_sesRNA:
     """Class for storing paramaters"""
-    def __init__(self, species, gene, typeSeq, isoform, length,
-                 num_inF_TGG, num_inF_Stop, num_inF_ATG,
+    def __init__(self, species, gene, spliceVariant, seqDirection, length,
+                 num_inF_TGG, num_inF_Stop, inF_ATG,
                  minGC, maxGC, nearCenter, fromStop):
         self.species = species
         self.gene = gene
+        self.spliceVariant = spliceVariant
 
-        self.typeSeq = typeSeq
+        self.seqDirection = seqDirection
 
-        self.isoform = isoform
         self.length = length
         self.num_inF_TGG = num_inF_TGG
         self.num_inF_Stop = num_inF_Stop
-        self.num_inF_ATG = num_inF_ATG
+        self.inF_ATG = inF_ATG
         self.minGC = minGC
         self.maxGC = maxGC
         self.nearCenter = nearCenter
@@ -46,16 +46,16 @@ class parameters_sesRNA:
         for attribute, value in self.__dict__.items():
             print(attribute, '=', value)
 
-def return_inCDS(sesRNAs, CDS, isoForm, typeSes):
+def check_inCDS(sesRNAs, CDS, typeSes):
     """Return sesRNAs that are in CDS"""
     temp_cds_sesRNAs = []
 
     for sesRNA in sesRNAs:
         if typeSes == 'Reverse':
-            if 0 != CDS[isoForm].seq.count(sesRNA.reverse_complement()):
+            if 0 != CDS[0].seq.count(sesRNA.reverse_complement()):
                 temp_cds_sesRNAs.append(sesRNA)
         elif typeSes == 'Complement':
-            if 0 != CDS[isoForm].seq.count(sesRNA.complement()):
+            if 0 != CDS[0].seq.count(sesRNA.complement()):
                 temp_cds_sesRNAs.append(sesRNA)
 
     return temp_cds_sesRNAs
@@ -68,25 +68,25 @@ def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters, variantTable
     :returns: TODO
     """
 
-    if parameters.typeSeq == 'Reverse':
+    if parameters.seqDirection == 'Reverse':
         rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
             generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters, variantTable)
         return rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs
-    elif parameters.typeSeq == 'Complement':
+    elif parameters.seqDirection == 'Complement':
         C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs = \
             generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters, variantTable)
         return C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs
-    elif parameters.typeSeq == 'Both':
+    elif parameters.seqDirection == 'Both':
         all_sesRNAs = []
         all_sesRNA_objs = []
 
-        parameters.typeSeq = 'Reverse'
+        parameters.seqDirection = 'Reverse'
         rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
             generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters, variantTable)
         all_sesRNAs.extend(rC_sesRNAs)
         all_sesRNA_objs.extend(rC_sesRNA_objs)
 
-        parameters.typeSeq = 'Complement'
+        parameters.seqDirection = 'Complement'
         C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs = \
             generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters, variantTable)
         all_sesRNAs.extend(C_sesRNAs)
@@ -185,15 +185,15 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
         cond2 = num_inF_TGG >= parameters.num_inF_TGG
 
         # Checking ATGs ... either no in frame or only if upstream of all TGGs
-        if parameters.num_inF_ATG == 'None':
+        if parameters.inF_ATG == 'None':
             cond3 = num_inF_ATG == 0
-        elif parameters.num_inF_ATG == "All upstream":
+        elif parameters.inF_ATG == "All upstream":
             if num_inF_TGG != 0 and num_inF_ATG != 0:
                 # Make sure all in frame ATG's upstream of all in frame TGG's
                 cond3 = (min(indices_inF_TGG) > max(indices_inF_ATG))
             else:
                 cond3 = num_inF_ATG == 0
-        elif parameters.num_inF_ATG == "Upstream central":
+        elif parameters.inF_ATG == "Upstream central":
             if num_inF_TGG != 0 and num_inF_ATG != 0:
                 # Make sure all in frame ATG's upstream of all in frame TGG's
                 cond3 = (central_inF_TGG > max(indices_inF_ATG))
@@ -222,7 +222,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
         if(cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7):
             # Only include if in region of gene (currently in CDS)
             if check_inCDS(subsequence, searchSequence,
-                           parameters.isoform, parameters.typeSeq):
+                           parameters.seqDirection):
 
                 # Appending passesed subsequences
                 sesSeq.append(subsequence)
@@ -241,7 +241,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
                 num_inF_ATGs.append(num_inF_ATG)
                 num_inF_Stops.append(num_inF_Stop)
 
-                tempTotal, tempProtein = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable, parameters.typeSeq)
+                tempTotal, tempProtein = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable, parameters.seqDirection)
                 exonTotal_Ratio.append(tempTotal)
                 exonProtein_Ratio.append(tempProtein)
 
@@ -258,7 +258,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
 
 
-    allMetrics = {'TypeSeq': parameters.typeSeq, 'Exon':exonNumber, "ExonFraction":exonTotal_Ratio, "ExonProteinFrac": exonProtein_Ratio, 
+    allMetrics = {'TypeSeq': parameters.seqDirection, 'Exon':exonNumber, "ExonFraction":exonTotal_Ratio, "ExonProteinFrac": exonProtein_Ratio, 
                   'StartSeq':startSeq, 'StopSeq':stopSeq,
                   'firstTGG': first_TGGs, 'centralTGG': most_centralTGGs,
                   'second_cTGG': second_centralTGGs,

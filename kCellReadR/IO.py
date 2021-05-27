@@ -16,10 +16,9 @@ from kCellReadR.paths import *
 from kCellReadR.ensembl import *
 
 # Loads reference sequences from bsubsequenceiomaRT Output folder
-def load_referenceSequences(geneName, species, spliceVariant):
+def load_referenceSequences(species, geneName, spliceVariant):
     """Generates reference sequence files if necessary"""
     
-
     spliceVariant = str(spliceVariant)
     save_speciesName = species.replace(" ", "_")
     # Base path for sequences for gene 
@@ -27,9 +26,11 @@ def load_referenceSequences(geneName, species, spliceVariant):
     # Path at which to check if sequences downloaded alread 
     test_BasePath = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'
     # Only run if sequences not already downloaded 
+    print('Downloading' + test_BasePath)
     if os.path.isfile(test_BasePath) == False:
         # Downloading sequences 
         download_ensemblSequences(species, geneName)
+        print('Downloaded')
 
     # Loading exons file 
     exon_fileName = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'

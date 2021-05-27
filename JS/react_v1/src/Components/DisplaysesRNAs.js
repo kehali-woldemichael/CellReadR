@@ -106,6 +106,15 @@ export class Display extends Component {
                             <br/>
                             <TextField 
                                 inputProps = {{ style: {textAlign: 'center'} }}
+                                placeholder = "How many in frame ATGs to allow"
+                                //InputLabelProps = "Gene Name"
+                                onChange = {handleChange('choice_ATG')}
+                                defaultValue={values.choice_ATG}
+                                style = {styles.textbox}
+                            />
+                            <br/>
+                            <TextField 
+                                inputProps = {{ style: {textAlign: 'center'} }}
                                 placeholder = "Minimum GC content"
                                 //InputLabelProps = "Gene Name"
                                 onChange = {handleChange('minGC')}
@@ -137,15 +146,6 @@ export class Display extends Component {
                                 //InputLabelProps = "Gene Name"
                                 onChange = {handleChange('dist_stop_cTGG')}
                                 defaultValue ={values.dist_stop_cTGG}
-                                style = {styles.textbox}
-                            />
-                            <br/>
-                            <TextField 
-                                inputProps = {{ style: {textAlign: 'center'} }}
-                                placeholder = "How many in frame ATGs to allow"
-                                //InputLabelProps = "Gene Name"
-                                onChange = {handleChange('choice_ATG')}
-                                defaultValue={values.choice_ATG}
                                 style = {styles.textbox}
                             />
                             <br/>

@@ -31,13 +31,14 @@ export class SesRNAEntry extends Component {
 
         seqDirection: '',         
         len_sesRNA: '',         
+        choice_ATG: '',         
+
         minTGG: '',         
         maxStop: '',         
         minGC: '',         
         maxGC: '',         
         dist_cTGG: '',         
         dist_stop_cTGG: '',         
-        choice_ATG: '',         
 
         chosenGene: false,
         loading_spliceVariantsInfo : false,
@@ -76,39 +77,39 @@ export class SesRNAEntry extends Component {
         this.setState({
             seqDirection: 'Both',         
             len_sesRNA: '204',         
+            choice_ATG: 'None',         
             minTGG: '2',         
             maxStop: '0',         
             minGC: '30',         
             maxGC: '70',         
             dist_cTGG: '10',         
-            dist_stop_cTGG: '20',         
-            choice_ATG: 'None'         
+            dist_stop_cTGG: '20'
         })
     }
     autofill_medium = () => {
         this.setState({
             seqDirection: 'Both',         
             len_sesRNA: '204',         
+            choice_ATG: 'All upstream',
             minTGG: '1',         
             maxStop: '1',         
             minGC: '30',         
             maxGC: '75',         
             dist_cTGG: '20',         
-            dist_stop_cTGG: '10',         
-            choice_ATG: 'All upstream'         
+            dist_stop_cTGG: '10'         
         })
     }
     autofill_permissive = () => {
         this.setState({
             seqDirection: 'Both',         
             len_sesRNA: '204',         
+            choice_ATG: 'Upstream central TGG',
             minTGG: '1',         
             maxStop: '2',         
             minGC: '30',         
             maxGC: '75',         
             dist_cTGG: '30',         
-            dist_stop_cTGG: '5',         
-            choice_ATG: 'Upstream central TGG'         
+            dist_stop_cTGG: '5'         
         })
     }
 
@@ -131,47 +132,20 @@ export class SesRNAEntry extends Component {
     }
 
     callAPI_spliceVariants = async() => {
+        // Changing state in order display loading screen 
         this.setState({ loading_spliceVariantsInfo: true } )
+        // POST request using axios with async/await
+        const geneDetails = { "species": this.state.species, "gene": this.state.gene}
+        console.log(geneDetails)
 
-        const url = "http://localhost:9000/GET"
+        const url = "http://localhost:9000/POST_spliceVariants"
+        const response = await axios.post(url, geneDetails)
+        console.log(response)
 
-        const response = await fetch(url)
-        const data = await response.json()
-        console.log(data)
-
-        this.setState({ spliceVariants_apiResponse: data } )
-
+        this.setState({ spliceVariants_apiResponse: response } )
         this.setState({ loading_spliceVariantsInfo: false } )
         this.setState({ loaded_spliceVariantsInfo: true } )
     }
-
-    send_geneDetails = async() => {
-        const url = "http://localhost:9000/POST"
-        // POST request using axios with async/await
-        const geneDetails = { gene: this.state.gene }
-        // const geneDetails = { gene: 'Fezf2' }
-        console.log(geneDetails)
-
-        // const response = await axios.get(url)
-        const response = await axios.post(url, geneDetails)
-        // const response = await fetch(url, {
-        //     method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        //     mode: 'cors', // no-cors, *cors, same-origin
-        //     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        //     credentials: 'same-origin', // include, *same-origin, omit
-        //     headers: {
-        //       'Content-Type': 'application/json'
-        //       // 'Content-Type': 'application/x-www-form-urlencoded',
-        //     },
-        //     redirect: 'follow', // manual, *follow, error
-        //     referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        //     body: JSON.stringify(geneDetails) // body data type must match "Content-Type" header
-        //   });
-        
-        console.log(response)
-        // this.setState({ articleId: response.data.id });
-    };
-
 
     render_sesRNAs = () => {
         if (this.state.sesRNAs_apiResponse && this.state.loadedTable_sesRNAs){
@@ -213,15 +187,15 @@ export class SesRNAEntry extends Component {
         // Pull out fields 
         const {species, gene, 
             spliceVariant, searchSeq,
-            seqDirection, len_sesRNA, minTGG, maxStop, minGC, maxGC, 
-            dist_cTGG, dist_stop_cTGG, choice_ATG, 
+            seqDirection, len_sesRNA, minTGG, maxStop, choiceATG, 
+            minGC, maxGC, dist_cTGG, dist_stop_cTGG, 
             chosenGene, loading_spliceVariantsInfo, loaded_spliceVariantsInfo, spliceVariants_apiResponse,
             loading_sesRNAs, loaded_sesRNAs, sesRNAs_apiResponse} = this.state 
         // To pass values to each component 
         const values = {species, gene, 
             spliceVariant, searchSeq,
-            seqDirection, len_sesRNA, minTGG, maxStop, minGC, maxGC, 
-            dist_cTGG, dist_stop_cTGG, choice_ATG, 
+            seqDirection, len_sesRNA, minTGG, maxStop, choiceATG,
+            minGC, maxGC, dist_cTGG, dist_stop_cTGG, 
             chosenGene, loading_spliceVariantsInfo, loaded_spliceVariantsInfo, spliceVariants_apiResponse,
             loading_sesRNAs, loaded_sesRNAs, sesRNAs_apiResponse} 
 
@@ -247,7 +221,6 @@ export class SesRNAEntry extends Component {
                         handleChange = {this.handleChange}
 
                         callAPI_spliceVariants = {this.callAPI_spliceVariants}
-                        send_geneDetails = {this.send_geneDetails}
                     />
                 )
             // Enter sesRNA parameters

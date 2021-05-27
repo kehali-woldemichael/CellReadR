@@ -16,6 +16,7 @@ import { FormControl } from '@material-ui/core';
 // import { MenuIcon } from '@material-ui/icons/Menu'
 // import { IconButton } from '@material-ui/core'
 import { InputLabel } from '@material-ui/core'
+import Select from '@material-ui/core/Select'
 
 export class FormSesRNApar extends Component {
     continue = e => {
@@ -84,8 +85,14 @@ export class FormSesRNApar extends Component {
                     <br/>
                     <h2>Manually enter sesRNA parameters</h2>
                     <br/>
-                    <InputLabel>Sequence Direction</InputLabel>
-                    <TextField 
+                    <InputLabel htmlFor="age-native-simple">Sequence Direction</InputLabel>
+                    <Select native onChange = {handleChange('choice_ATG')} inputinputProps = {{ style: {textAlign: 'center'}} }>
+                        <option value={'Both'}>Both</option>
+                        <option value={'Reverse complement'}>Reverse complement</option>
+                        <option value={'Complement'}>Complement</option>
+                        ))}
+                    </Select>
+                    {/* <TextField 
                         inputProps = {{ style: {textAlign: 'center'} }}
                         placeholder = "Both, Reverse Complement, Complement"
                         //InputLabelProps = "Gene Name"
@@ -93,7 +100,8 @@ export class FormSesRNApar extends Component {
                         defaultValue={values.seqDirection}
                         value={values.seqDirection}
                         style = {styles.textbox}
-                    />
+                    /> */}
+                    <br/>
                     <br/>
                     <InputLabel>Length of sesRNA</InputLabel>
                     <TextField 
@@ -126,6 +134,24 @@ export class FormSesRNApar extends Component {
                         value={values.maxStop}
                         style = {styles.textbox}
                     />
+                    <br/>
+                    <InputLabel htmlFor="age-native-simple">In frame ATGs</InputLabel>
+                    <Select native onChange = {handleChange('choice_ATG')} inputinputProps = {{ style: {textAlign: 'center'}} }>
+                        <option value={'None'}>None</option>
+                        <option value={'All upstream'}>All upstream</option>
+                        <option value={'One upstream'}>One upstream</option>
+                        ))}
+                    </Select>
+                    {/* <TextField 
+                        inputProps = {{ style: {textAlign: 'center'} }}
+                        placeholder = "None, All upstream, One upstream"
+                        //InputLabelProps = "Gene Name"
+                        onChange = {handleChange('choice_ATG')}
+                        defaultValue={values.choice_ATG}
+                        value={values.choice_ATG}
+                        style = {styles.textbox}
+                    /> */}
+                    <br/>
                     <br/>
                     <InputLabel>Minimum GC content</InputLabel>
                     <TextField 
@@ -171,17 +197,6 @@ export class FormSesRNApar extends Component {
                         style = {styles.textbox}
                     />
                     <br/>
-                    <InputLabel>In frame ATGs</InputLabel>
-                    <TextField 
-                        inputProps = {{ style: {textAlign: 'center'} }}
-                        placeholder = "None, All upstream, One upstream"
-                        //InputLabelProps = "Gene Name"
-                        onChange = {handleChange('choice_ATG')}
-                        defaultValue={values.choice_ATG}
-                        value={values.choice_ATG}
-                        style = {styles.textbox}
-                    />
-                    <br/>
                     <ButtonGroup>
                         <Button
                             label = "Back"
@@ -214,6 +229,9 @@ const styles = {
         width: '10%',
     },
     button: {
+        margin: 15
+    },
+    select: {
         margin: 15
     }
 }
