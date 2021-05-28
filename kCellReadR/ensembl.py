@@ -178,6 +178,7 @@ def return_ensemblTranscriptIDs(species, geneSymbol):
             return mg.getgene(tempID, fields = 'ensembl')['ensembl']['transcript']
     # Otherwise much use taxon id
     else:
+        print('return_ensemblTranscriptID ... species: ' + species)
         scientificSpeciesName, taxonID = return_scientificName(species) 
             
         mg = mygene.MyGeneInfo()
@@ -264,6 +265,7 @@ def return_scientificName(speciesName):
     speciesEnsembl = pd.read_csv(path_speciesEnsembl)
     scientificName = speciesEnsembl[speciesEnsembl['Common name'] == speciesName]['Scientific name']
     taxonID = speciesEnsembl[speciesEnsembl['Common name'] == speciesName]['Taxon ID']
+    print(scientificName)
 
     return scientificName.tolist()[0].lower().replace(" ", "_"), taxonID.tolist()[0] 
 

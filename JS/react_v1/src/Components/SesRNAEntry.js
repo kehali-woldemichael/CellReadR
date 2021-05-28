@@ -117,18 +117,32 @@ export class SesRNAEntry extends Component {
     // When called ... fetches JSON of sesRNAs from node.js Express server 
     // Then changes loading state to false 
     callAPI_sesRNAs = async() => {
-        this.setState({ loadingTable_sesRNAs: true } )
+        // Changing state in order display loading screen 
+        this.setState({ loading_sesRNAs: true } )
+        // POST request using axios with async/await
+        const sesRNA_parameters = {   "species" : this.state.species, 
+                                "gene" : this.state.gene,
+                                "spliceVariant" : this.state.spliceVariant,
+                                "variantTable" : this.state.spliceVariants_apiResponse, 
+                                "searchSeq" : this.state.searchSeq,
+                                "seqDirection" : this.state.seqDirection,
+                                "len_sesRNA" : this.state.len_sesRNA,
+                                "minTGG" : this.state.minTGG,
+                                "maxStop" : this.state.maxStop, 
+                                "choice_ATG" : this.state.choice_ATG,
+                                "minGC" : this.state.minGC, 
+                                "maxGC" : this.state.maxGC, 
+                                "dist_cTGG" : this.state.dist_cTGG,
+                                "dist_stop_cTGG" : this.state.dist_stop_cTGG}
+        console.log(sesRNA_parameters)
 
-        const url = "http://localhost:9001"
-        // const url = "https://api.randomuser.me/"
+        const url = "http://localhost:9000/POST_sesRNAs"
+        const response = await axios.post(url, sesRNA_parameters)
+        console.log(response)
 
-        const response = await fetch(url)
-        const data = await response.json()
-
-        this.setState({ sesRNAs_apiResponse: data } )
-
-        this.setState({ loadingTable_sesRNAs: false } )
-        this.setState({ loadedTable_sesRNAs: true } )
+        this.setState({ sesRNAs_apiResponse: response } )
+        this.setState({ loading_sesRNAs: false } )
+        this.setState({ loaded_sesRNAs: true } )
     }
 
     callAPI_spliceVariants = async() => {
@@ -233,6 +247,7 @@ export class SesRNAEntry extends Component {
                         handleChange = {this.handleChange}
                         values = {values}
 
+                        callAPI_sesRNAs = {this.callAPI_sesRNAs}
                         autofill_strict = {this.autofill_strict}
                         autofill_medium = {this.autofill_medium}
                         autofill_permissive = {this.autofill_permissive}

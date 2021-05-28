@@ -26,11 +26,11 @@ def load_referenceSequences(species, geneName, spliceVariant):
     # Path at which to check if sequences downloaded alread 
     test_BasePath = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'
     # Only run if sequences not already downloaded 
-    print('Downloading' + test_BasePath)
+    # print('Downloading' + test_BasePath)
     if os.path.isfile(test_BasePath) == False:
         # Downloading sequences 
         download_ensemblSequences(species, geneName)
-        print('Downloaded')
+        # print('Downloaded')
 
     # Loading exons file 
     exon_fileName = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'

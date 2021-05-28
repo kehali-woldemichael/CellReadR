@@ -46,16 +46,16 @@ class parameters_sesRNA:
         for attribute, value in self.__dict__.items():
             print(attribute, '=', value)
 
-def check_inCDS(sesRNAs, CDS, typeSes):
+def check_inSearchSeq(sesRNAs, searchSeq, seqDirection):
     """Return sesRNAs that are in CDS"""
     temp_cds_sesRNAs = []
 
     for sesRNA in sesRNAs:
-        if typeSes == 'Reverse':
-            if 0 != CDS[0].seq.count(sesRNA.reverse_complement()):
+        if seqDirection == 'Reverse':
+            if 0 != searchSeq[0].seq.count(Seq(sesRNA).reverse_complement()):
                 temp_cds_sesRNAs.append(sesRNA)
-        elif typeSes == 'Complement':
-            if 0 != CDS[0].seq.count(sesRNA.complement()):
+        elif seqDirection == 'Complement':
+            if 0 != searchSeq[0].seq.count(Seq(sesRNA).complement()):
                 temp_cds_sesRNAs.append(sesRNA)
 
     return temp_cds_sesRNAs
@@ -117,7 +117,7 @@ def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters, variant
         all_sequenceMetrics = all_sequenceMetrics.append(temp_sequenceMetrics)
 
         # Printing number of passed sequences for current exon
-        print(len(temp_sesRNAs))
+        # print(len(temp_sesRNAs))
 
     # Creating column for number of sequence ...
     # Then moving that column to the front
@@ -221,7 +221,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
         if(cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7):
             # Only include if in region of gene (currently in CDS)
-            if check_inCDS(subsequence, searchSequence,
+            if check_inSearchSeq(subsequence, searchSequence,
                            parameters.seqDirection):
 
                 # Appending passesed subsequences

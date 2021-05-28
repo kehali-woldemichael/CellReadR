@@ -22,6 +22,8 @@ export class FormSesRNApar extends Component {
     continue = e => {
         e.preventDefault()
         this.props.nextStep()
+        this.props.callAPI_sesRNAs()
+
     }
     back = e => {
         e.preventDefault()
