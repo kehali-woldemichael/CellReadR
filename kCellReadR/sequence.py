@@ -46,12 +46,12 @@ def return_inFrame(sequence, choice):
     if choice == 'numTGG': return num_inF_TGG
 
 # Return sesRNAs that are in CDS
-def check_inCDS(sequence, searchSequence, isoForm, typeSes):
+def check_inSearchSeq(sequence, searchSequence, typeSes):
     if typeSes == 'Reverse':
         return 0 != \
-            searchSequence[isoForm].seq.count(sequence.reverse_complement())
+            searchSequence[0].seq.count(sequence.reverse_complement())
     elif typeSes == 'Complement':
-        return 0 != searchSequence[isoForm].seq.count(sequence.complement())
+        return 0 != searchSequence[0].seq.count(sequence.complement())
 
 def check_cORF(sequence):
     """Checks if continuous open reading frame by translating to stop ..."""
@@ -105,3 +105,32 @@ def check_inExonVariants(sesRNA, speciesName, geneName, variantTable, seqDirecti
                     inExon_proteinCoding += 1 
                 
     return (str(inExon) + "/" + str(exonVariant_Count)), (str(inExon_proteinCoding) + "/" + str(exonVariant_proteinCoding_Count))
+
+# Given sequence ... converts to in frame TGGs to TAGs and in frame stops so that first 'T' becomes 'G'
+# Had to be careful to only work with in frame codons ... initally had made the mistake to just use string.replace ... this would change out of frame codons as well 
+def convert_DNA(sequence, numberConvert):
+    # Converting to string object for manipulation 
+    strSeq = str(sequence)
+    # Generating in frame object variables 
+    num_inF_TGG, num_inF_ATG, num_inF_Stop, indicesTGG, indicesATG, indicesStop = return_inFrame(Seq(strSeq), 'all')
+    print(num_inF_TGG)
+    # print(num_inF_Stop)
+
+    # Replacing in frame stop codons in sequence 
+    for stop in indicesStop: 
+        stopPairs = [("TAG", "GAG"), ("TAA", "GAA"), ("TGA", "GGA")]
+        stopSeq = strSeq[stop:stop+3]
+        [stopSeq := stopSeq.replace(a, b) for a, b in stopPairs]
+        strSeq = strSeq[:stop] + stopSeq + strSeq[stop+3:]
+    
+    # Setting number convert to all if 'All' selected as number of TGG to convert 
+    if numberConvert == 'All': numberConvert = num_inF_TGG
+    # Converting TGG's ... up to number set ... and in order from starting with most central 
+    # Sorts indicees by distance from center 
+    sorted_indices_centralTGG = np.array(sorted(indicesTGG - (len(strSeq)/2), key = abs)) + (len(strSeq)/2)
+    # Converts in frame TGG's ... starting from most central TGG ... up to limit set by numberConvert 
+    for i in range(numberConvert):
+        currentIndex = int(sorted_indices_centralTGG[i])
+        strSeq = strSeq[:currentIndex] + 'TAG' + strSeq[currentIndex+3:]
+    # Returns RNA 
+    return Seq(strSeq).transcribe()

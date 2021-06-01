@@ -46,7 +46,7 @@ class parameters_sesRNA:
         for attribute, value in self.__dict__.items():
             print(attribute, '=', value)
 
-def check_inSearchSeq(sesRNAs, searchSeq, seqDirection):
+def return_inSearchSeq(sesRNAs, searchSeq, seqDirection):
     """Return sesRNAs that are in CDS"""
     temp_cds_sesRNAs = []
 
@@ -210,11 +210,13 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
         # Checking if central TGG is more than some bp away
         # from an in frame stop
         if num_inF_Stop != 0 and num_inF_TGG != 0:
-            if num_inF_TGG > 1:
-                cond7 = any((min(abs(indices_inF_Stop - i)) >= parameters.fromStop)
-                            for i in centralTGGs)
-            else:
-                cond7 = any((min(abs(indices_inF_Stop - i)) >= parameters.fromStop)
+            #if num_inF_TGG > 1:
+                #cond7 = any((min(abs(indices_inF_Stop - i)) >= parameters.fromStop)
+                            #for i in centralTGGs)
+            #else:
+                #cond7 = any((min(abs(indices_inF_Stop - i)) >= parameters.fromStop)
+                            #for i in [centralTGGs[0]])
+            cond7 = any((min(abs(indices_inF_Stop - i)) >= parameters.fromStop)
                             for i in [centralTGGs[0]])
         else:
             cond7 = True

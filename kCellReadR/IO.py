@@ -6,6 +6,8 @@ from Bio.SeqRecord import SeqRecord
 
 # For calling cmd fuctions
 import subprocess
+# For saving sesRNAs 
+from datetime import datetime
 # For checiking if reference sequecnes exist
 import os
 from kCellReadR.sequence import *
@@ -86,3 +88,25 @@ def convert_DNA(sequence, numberConvert):
         strSeq = strSeq[:currentIndex] + 'TAG' + strSeq[currentIndex+3:]
     # Returns RNA
     return Seq(strSeq).transcribe()
+
+def save_all_sesRNAs_DNA(sesRNAs, species, gene):
+    savePath = basePath + 'Output/sesRNAs/'
+    # Generating BioPython directory if does not exist 
+    pathlib.Path(savePath).mkdir(parents=True, exist_ok=True)
+
+    # Generate SeqRecord object for each sequence and append to list 
+    outputID = gene + '_sesRNA_'
+    outputDescription = "sesRNA for " + gene
+
+    # Generating sequence record objects (for seperate storage)
+    outputSeqMulti = []
+    n = 1
+    for i in sesRNAs:
+        outputSeqMulti.append(SeqRecord(i, id = (outputID + str(n)), description = outputDescription))
+        n += 1
+
+    # Write output fasta files 
+    saveBase = savePath + species.replace(' ', '_') + '_' + gene + '_sesRNAs_' 
+    saveName = saveBase + datetime.now().strftime("%d-%m-%Y_%H-%M-%S") + '.fasta'
+    with open(saveName, "w") as output_handle:
+        SeqIO.write(outputSeqMulti, output_handle, "fasta")

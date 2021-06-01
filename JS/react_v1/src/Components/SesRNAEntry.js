@@ -29,9 +29,9 @@ export class SesRNAEntry extends Component {
 
         searchSeq: 'CDS',         
 
-        seqDirection: '',         
+        seqDirection: 'Both',         
         len_sesRNA: '',         
-        choice_ATG: '',         
+        choice_ATG: 'None',         
 
         minTGG: '',         
         maxStop: '',         

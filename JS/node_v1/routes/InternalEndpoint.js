@@ -21,7 +21,7 @@ router.post('/POST_spliceVariants', function(req, res, next) {
 
   // Spawn new child process to call the python script
   // Returns information on splice variant given species and gene names 
-  const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR_Temp/Code/kCellReadR/json_spliceInformation.py'
+  const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/kCellReadR/json_spliceInformation.py'
   const parameters = [pyFunction_spliceVariant, req.body.species, req.body.gene]
   const python = spawn('python', parameters)
 
@@ -52,7 +52,7 @@ router.post('/POST_sesRNAs', function(req, res, next) {
   console.log(`Test:${req.body.choice_ATG}`);
 
   // Defining function name/path and parameters for generating sesRNAs
-  const pyFunction_sesRNAs = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR_Temp/Code/kCellReadR/json_sesRNAs.py'
+  const pyFunction_sesRNAs = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/kCellReadR/json_sesRNAs.py'
   const parameters = [pyFunction_sesRNAs, 
                       req.body.species, 
                       req.body.gene,
