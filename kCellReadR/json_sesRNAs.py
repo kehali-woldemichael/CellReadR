@@ -13,7 +13,7 @@ def json_output_sesRNAs():
     geneName = sys.argv[2]
     spliceVariant = int(sys.argv[3])
     searchSeq = sys.argv[4]
-    variantTable = sys.argv[5]
+    variantTable = json.loads(sys.argv[5])
     # sesRNA parameters
     seqDirection = sys.argv[6]
     len_sesRNA = int(sys.argv[7])
@@ -36,15 +36,15 @@ def json_output_sesRNAs():
     if searchSeq == 'CDS': chosen_searchSeq = CDS
     elif searchSeq == 'cDNA': chosen_searchSeq = cDNA
 
-    all_sesRNAs, all_sequenceMetrics, all_sesRNA_objs = generate_all_sesRNAs(rC_exon_records, C_exon_records, chosen_searchSeq, parameters, variantTable)
+    all_sesRNAs, all_sequenceMetrics, all_sesRNA_objs = generate_all_sesRNAs(rC_exon_records, C_exon_records, chosen_searchSeq, parameters, _variantTable)
 
     # Generating pd.Dataframe
     df = pd.DataFrame(all_sequenceMetrics)
     # Converting DataFrame to json and dumping it to std.out
     df_json = df.reset_index().to_json(orient="values")
+    df_json = variantTable    
     parsed = jsons.loads(df_json)
     print(jsons.dumps(parsed, indent=4))
-    sys.stdout.flush()
 
 if __name__ == "__main__":
     from ensembl import *

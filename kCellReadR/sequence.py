@@ -40,8 +40,16 @@ def return_inFrame(sequence, choice):
     indiciesStop = \
         np.array([key for key, val in enumerate(codons) if val in stopCodons])*3
 
+    num_inF_TTGG = 0 
+    num_inF_TGGA = 0 
+    num_inF_TTGGA = 0 
+    for i in indicesTGG: 
+        if sequence[i-1:i+3] == "TTGG": num_inF_TTGG += 1 
+        if sequence[i:i+4] == "TGGA": num_inF_TGGA += 1 
+        if sequence[i-1:i+4] == "TTGGA": num_inF_TTGGA += 1 
+
     if choice == 'all':
-        return num_inF_TGG, num_inF_ATG, num_inF_Stop, \
+        return num_inF_TGG, num_inF_TTGG, num_inF_TGGA, num_inF_TTGGA, num_inF_ATG, num_inF_Stop, \
             indicesTGG, indicesATG, indiciesStop
     if choice == 'numTGG': return num_inF_TGG
 
@@ -88,7 +96,7 @@ def check_inExonVariants(sesRNA, speciesName, geneName, variantTable, seqDirecti
             temp_seqRecord = list(SeqIO.parse(entry.path, "fasta"))
             if len(temp_seqRecord) != 0:
                 exonVariants.append(list(SeqIO.parse(entry.path, "fasta")))
-                if variantTable['Type'][exonVariant_Count - 1] == 'protein_coding':
+                if variantTable[exonVariant_Count - 1] == 'protein_coding':
                     exonVariant_proteinCoding_Count += 1
                 
     inExon = 0
@@ -97,11 +105,11 @@ def check_inExonVariants(sesRNA, speciesName, geneName, variantTable, seqDirecti
         for x in range(len(exonVariants[i])):
             if seqDirection == "Complement" and sesRNA.complement() in exonVariants[i][x].seq:
                 inExon += 1
-                if variantTable['Type'][i] == 'protein_coding':
+                if variantTable[i] == 'protein_coding':
                     inExon_proteinCoding += 1 
             if seqDirection == "Reverse" and sesRNA.reverse_complement() in exonVariants[i][x].seq:
                 inExon += 1
-                if variantTable['Type'][i] == 'protein_coding':
+                if variantTable[i] == 'protein_coding':
                     inExon_proteinCoding += 1 
                 
     return (str(inExon) + "/" + str(exonVariant_Count)), (str(inExon_proteinCoding) + "/" + str(exonVariant_proteinCoding_Count))

@@ -148,6 +148,10 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
     # For storing number of in frame TGG, ATG, and Stop codons
     num_inF_TGGs = []
+    num_inF_TTGGs = []
+    num_inF_TGGAs = []
+    num_inF_TTGGAs = []
+
     num_inF_ATGs = []
     num_inF_Stops = []
 
@@ -163,7 +167,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
         # GC content
         gcContent = metric_gcContent(subsequence)*100
-        num_inF_TGG, num_inF_ATG, num_inF_Stop, indices_inF_TGG, \
+        num_inF_TGG, num_inF_TTGG, num_inF_TGGA, num_inF_TTGGA, num_inF_ATG, num_inF_Stop, indices_inF_TGG, \
             indices_inF_ATG, indices_inF_Stop = \
             return_inFrame(subsequence, 'all')
 
@@ -240,6 +244,10 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
                 # Appending number of in frame TGGs, ATGs, and Stop codons
                 num_inF_TGGs.append(num_inF_TGG)
+                num_inF_TTGGs.append(num_inF_TTGG)
+                num_inF_TGGAs.append(num_inF_TGGA)
+                num_inF_TTGGAs.append(num_inF_TTGGA)
+
                 num_inF_ATGs.append(num_inF_ATG)
                 num_inF_Stops.append(num_inF_Stop)
 
@@ -249,7 +257,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
                 sesRNA_objs.append(sesRNA(subsequence, start, start+length,
                                           indices_inF_TGG[0], central_inF_TGG,
-                                          centralTGGs[1], num_inF_TGGs,
+                                          centralTGGs[1], num_inF_TGGs, 
                                           num_inF_ATGs, num_inF_Stops,
                                           gcContent))
 
@@ -260,12 +268,14 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
 
 
-    allMetrics = {'TypeSeq': parameters.seqDirection, 'Exon':exonNumber, "ExonFraction":exonTotal_Ratio, "ExonProteinFrac": exonProtein_Ratio, 
+    allMetrics = {'TypeSeq': parameters.seqDirection, 'Exon':exonNumber, "ExonFrac":exonTotal_Ratio, "ExonProtFrac": exonProtein_Ratio, 
                   'StartSeq':startSeq, 'StopSeq':stopSeq,
                   'firstTGG': first_TGGs, 'centralTGG': most_centralTGGs,
                   'second_cTGG': second_centralTGGs,
-                  'numTGG':num_inF_TGGs, 'numATG':num_inF_ATGs,
-                  'numStop':num_inF_Stops, 'gcContent':gcContents}
+                  'numTGG':num_inF_TGGs, 
+                  "numTTGG": num_inF_TTGG, "numTGGA": num_inF_TGGA, "numTTGGA": num_inF_TTGGA, 
+                  'numATG':num_inF_ATGs,
+                  'numStop':num_inF_Stops, 'gcCont':gcContents}
     sequenceMetrics = pd.DataFrame(allMetrics)
 
     return sesSeq, sequenceMetrics, sesRNA_objs

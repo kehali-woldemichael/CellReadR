@@ -21,7 +21,8 @@ router.post('/POST_spliceVariants', function(req, res, next) {
 
   // Spawn new child process to call the python script
   // Returns information on splice variant given species and gene names 
-  const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/kCellReadR/json_spliceInformation.py'
+  
+  const pyFunction_spliceVariant = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/kCellReadR/ensembl.py'
   const parameters = [pyFunction_spliceVariant, req.body.species, req.body.gene]
   const python = spawn('python', parameters)
 
@@ -37,6 +38,8 @@ router.post('/POST_spliceVariants', function(req, res, next) {
   // Close child python process 
   python.on('close', (code) => {
   console.log(`child process close all stdio with code ${code}`)
+  console.log(`splice:${dataToSend}`);
+  console.log(`splice constructor:${dataToSend.constructor}`);
   // Send data to browser
   res.send(dataToSend)
   })
@@ -46,10 +49,16 @@ router.post('/POST_spliceVariants', function(req, res, next) {
 // Given species, gene name, and sesRNA selection parameters 
 router.post('/POST_sesRNAs', function(req, res, next) {
   console.log(`Test 1:${Object.keys(req)}`);
-  console.log(`Test:${req.body.species}`);
-  console.log(`Test:${req.body.gene}`);
-  console.log(`Test:${req.body.minGC}`);
-  console.log(`Test:${req.body.choice_ATG}`);
+  console.log(`Species:${req.body.species}`);
+  console.log(`Gene:${req.body.gene}`);
+  console.log(`minGC:${req.body.minGC}`);
+
+  var variantTable = req.body.variantTable.data
+  var variantTable_JSON = req.body.variantTable.data.toString()
+  console.log(`variantTable data:${variantTable}`);
+  console.log(`variantTable constructor:${variantTable.constructor}`);
+  console.log(`variantTable toString:${variantTable_JSON}`);
+  console.log(`variantTable toString constructor:${variantTable_JSON.constructor}`);
 
   // Defining function name/path and parameters for generating sesRNAs
   const pyFunction_sesRNAs = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/kCellReadR/json_sesRNAs.py'
@@ -57,7 +66,7 @@ router.post('/POST_sesRNAs', function(req, res, next) {
                       req.body.species, 
                       req.body.gene,
                       req.body.spliceVariant,
-                      req.body.variantTable, 
+                      req.body.variantTable.data.toString(), 
                       req.body.searchSeq,
                       req.body.seqDirection,
                       req.body.len_sesRNA,
@@ -88,7 +97,7 @@ router.post('/POST_sesRNAs', function(req, res, next) {
   python.on('close', (code) => {
   console.log(`child process close all stdio with code ${code}`)
   // Send data to browser
-  console.log(dataToSend)
+  console.log(`sesRNAs:${dataToSend}`);
   res.send(dataToSend)
   })
 })

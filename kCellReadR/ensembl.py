@@ -7,6 +7,8 @@ import pathlib
 import pandas as pd
 # For timing main call 
 import time
+import sys
+import json 
 # For sending gene splice variants 
 import numpy as np
 import jsons
@@ -15,6 +17,26 @@ import jsons
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord 
 from Bio import SeqIO
+
+
+def json_output_spliceVariants():
+    '''Ouputs pandas.DataFrame as json ... for node.js Express server
+    Splice variant information (bioType)'''
+
+    speciesName = sys.argv[1]
+    geneName = sys.argv[2]
+
+    # Generating transcriptIDs for gene
+    ensembl_transcriptIDs = return_ensemblTranscriptIDs(speciesName, geneName)
+    # Generating transcript splice variant metrics 
+    transcriptMetrics = table_transcriptsInfo(ensembl_transcriptIDs)
+    # Generating pd.Dataframe
+    df = pd.DataFrame(transcriptMetrics)
+
+    # Converting DataFrame to json and dumping it to std.out
+    df_json = df.reset_index().to_json(orient="values")
+    parsed = jsons.loads(df_json)
+    print(jsons.dumps(parsed, indent=4))
 
 
 def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
@@ -269,12 +291,9 @@ def return_scientificName(speciesName):
 
 
 if __name__ == "__main__":
-    initialTime = time.perf_counter()
     from paths import *
-    download_ensemblSequences()
-    print(time.perf_counter() - initialTime)
+    json_output_spliceVariants()
 if __name__ != "__main__":
     sys.path.append('/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR_Temp/Code') 
     from kCellReadR.paths import *
-    #from paths import *
 
