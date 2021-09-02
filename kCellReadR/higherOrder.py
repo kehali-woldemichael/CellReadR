@@ -31,25 +31,13 @@ def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
         if i < 10: numSes = '0' + str(i)
         else: numSes = str(i)
 
-#        # Defining output name
+        # Defining output name
         outputName = geneName + '_' + numSes
         outputDescription = "sesRNA #" + numSes
 
-        # Original code block w/o any reversing out output fasta for complement
-#        outputRecord = SeqRecord(sesRNA, id = outputName, description = outputDescription)
-#        outputFull = basePath + '/Output/BioPython/Temp/' + outputName + '.fasta'
-
-        # Writing the sequence reversed if complement
-        # Otherwise messes up RNA-RNA interaction calculations
-        # Reversing seems to affect mfe ensemble frequency ...
-        if sequenceMetrics['TypeSeq'].iloc[i-1] == 'Reverse':
-            outputRecord = SeqRecord(sesRNA, id = outputName, description = outputDescription)
-            outputFull = basePath + '/Output/BioPython/Temp/' + outputName + '.fasta'
-        else:
-            # Reversing sequence
-            tempSeq = Seq(str(sesRNA[::-1]))
-            outputRecord = SeqRecord(tempSeq, id = outputName, description = outputDescription)
-            outputFull = basePath + '/Output/BioPython/Temp/' + outputName + '.fasta'
+        # Writing reverse complement
+        outputRecord = SeqRecord(sesRNA, id = outputName, description = outputDescription)
+        outputFull = basePath + '/Output/BioPython/Temp/' + outputName + '.fasta'
 
         with open(outputFull, "w") as output_handle:
             SeqIO.write(outputRecord, output_handle, "fasta")

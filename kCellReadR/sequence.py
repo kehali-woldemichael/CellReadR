@@ -52,6 +52,7 @@ def return_inFrame(sequence, choice):
         return num_inF_TGG, num_inF_TTGG, num_inF_TGGA, num_inF_TTGGA, num_inF_ATG, num_inF_Stop, \
             indicesTGG, indicesATG, indiciesStop
     if choice == 'numTGG': return num_inF_TGG
+    if choice == 'numStop': return num_inF_Stop, indiciesStop
 
 # Return sesRNAs that are in CDS
 def check_inSearchSeq(sequence, searchSequence, typeSes):
@@ -83,36 +84,47 @@ def check_inExonVariants(sesRNA, speciesName, geneName, variantTable, seqDirecti
     """Function for checking if sesRNA how many of exons (checks total and only protein coding)"""
     seqDir_Path = ensembl_BasePath + '/' + speciesName.replace(' ', '_') 
     exonPartialPath = seqDir_Path + '/' + geneName + '_exons_'
+    cdsPartialPath = seqDir_Path + '/' + geneName + '_cds_'
+    cdnaPartialPath = seqDir_Path + '/' + geneName + '_cdna_'
     
-    exonVariant_Count = 0 
-    exonVariant_proteinCoding_Count = 0
+    exonVariant_proteinCoding_Count = len(variantTable[variantTable == 'protein_coding'])
+
     exonVariants = []
-    i = 0 
+    cdsVariants = []
+    cdnaVariants = []
+
     # Sorting so that goes through exons ... 
     for entry in sorted(os.scandir(seqDir_Path), key=lambda e: e.name):
-        i += 1
         if exonPartialPath in entry.path:
-            exonVariant_Count += 1 
-            temp_seqRecord = list(SeqIO.parse(entry.path, "fasta"))
-            if len(temp_seqRecord) != 0:
-                exonVariants.append(list(SeqIO.parse(entry.path, "fasta")))
-                if variantTable[exonVariant_Count - 1] == 'protein_coding':
-                    exonVariant_proteinCoding_Count += 1
+            exonVariants.append(list(SeqIO.parse(entry.path, "fasta")))
+        if cdsPartialPath in entry.path:
+            cdsVariants.append(list(SeqIO.parse(entry.path, "fasta")))
+        if cdnaPartialPath in entry.path:
+            cdnaVariants.append(list(SeqIO.parse(entry.path, "fasta")))
                 
     inExon = 0
     inExon_proteinCoding = 0
-    for i in range(len(exonVariants)):
+    inCDS = 0 
+    inCDNA = 0 
+
+    # Loop over total number of variants 
+    # Check if sesRNA sequence in exon, protein coding exon, and cDNA 
+    for i in range(len(variantTable)):
+        rC_sesRNA = sesRNA.reverse_complement()
+
+        # Check if sesRNA in exon variant (with seperate count for protein coding exons) 
         for x in range(len(exonVariants[i])):
-            if seqDirection == "Complement" and sesRNA.complement() in exonVariants[i][x].seq:
+            if rC_sesRNA in exonVariants[i][x].seq:
                 inExon += 1
                 if variantTable[i] == 'protein_coding':
                     inExon_proteinCoding += 1 
-            if seqDirection == "Reverse" and sesRNA.reverse_complement() in exonVariants[i][x].seq:
-                inExon += 1
-                if variantTable[i] == 'protein_coding':
-                    inExon_proteinCoding += 1 
+        if rC_sesRNA in cdnaVariants[i][0].seq: inCDNA += 1
+
+    # Separte loop to check against CDS 
+    for i in range(exonVariant_proteinCoding_Count):
+        if rC_sesRNA in cdsVariants[i][0].seq: inCDS += 1
                 
-    return (str(inExon) + "/" + str(exonVariant_Count)), (str(inExon_proteinCoding) + "/" + str(exonVariant_proteinCoding_Count))
+    return (str(inExon) + "/" + str(len(exonVariants))),(str(inExon_proteinCoding) + "/" + str(exonVariant_proteinCoding_Count)), (str(inCDS) + "/" + str(len(cdsVariants))), (str(inCDNA) + "/" + str(len(cdnaVariants)))
 
 # Given sequence ... converts to in frame TGGs to TAGs and in frame stops so that first 'T' becomes 'G'
 # Had to be careful to only work with in frame codons ... initally had made the mistake to just use string.replace ... this would change out of frame codons as well 
@@ -120,12 +132,14 @@ def convert_DNA(sequence, numberConvert):
     # Converting to string object for manipulation 
     strSeq = str(sequence)
     # Generating in frame object variables 
-    num_inF_TGG, num_inF_ATG, num_inF_Stop, indicesTGG, indicesATG, indicesStop = return_inFrame(Seq(strSeq), 'all')
+    num_inF_TGG, num_inF_TTGG, num_inF_TGGA, num_inF_TTGGA, num_inF_ATG, num_inF_Stop, indices_inF_TGG, \
+        indices_inF_ATG, indices_inF_Stop = \
+        return_inFrame(strSeq, 'all')
     print(num_inF_TGG)
     # print(num_inF_Stop)
 
     # Replacing in frame stop codons in sequence 
-    for stop in indicesStop: 
+    for stop in indices_inF_Stop: 
         stopPairs = [("TAG", "GAG"), ("TAA", "GAA"), ("TGA", "GGA")]
         stopSeq = strSeq[stop:stop+3]
         [stopSeq := stopSeq.replace(a, b) for a, b in stopPairs]
@@ -135,7 +149,7 @@ def convert_DNA(sequence, numberConvert):
     if numberConvert == 'All': numberConvert = num_inF_TGG
     # Converting TGG's ... up to number set ... and in order from starting with most central 
     # Sorts indicees by distance from center 
-    sorted_indices_centralTGG = np.array(sorted(indicesTGG - (len(strSeq)/2), key = abs)) + (len(strSeq)/2)
+    sorted_indices_centralTGG = np.array(sorted(indices_inF_TGG - (len(strSeq)/2), key = abs)) + (len(strSeq)/2)
     # Converts in frame TGG's ... starting from most central TGG ... up to limit set by numberConvert 
     for i in range(numberConvert):
         currentIndex = int(sorted_indices_centralTGG[i])

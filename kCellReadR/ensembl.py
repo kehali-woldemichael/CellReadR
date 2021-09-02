@@ -71,17 +71,24 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
         # Had to split up ... when only one splice variant returns str ... otherwise returns list
         if type(ensembl_transcriptIDs) != str:
             for id in ensembl_transcriptIDs:
-                outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + save_speciesName + ".fasta"
-                outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + save_speciesName + ".fasta"
-                outputName_cdna = path_species + "/" + geneName + "_cdna_" + str(i) + "_" + save_speciesName + ".fasta"
+                seqNum = str(i)
+                outputName_exons = path_species + "/" + geneName + "_exons_" + seqNum + "_" + save_speciesName + ".fasta"
+                outputName_introns = path_species + "/" + geneName + "_introns_" + seqNum + "_" + save_speciesName + ".fasta"
+                outputName_cds = path_species + "/" + geneName + "_cds_" + seqNum + "_" + save_speciesName + ".fasta"
+                outputName_cdna = path_species + "/" + geneName + "_cdna_" + seqNum + "_" + save_speciesName + ".fasta"
+                outputName_genomic = path_species + "/" + geneName + "_genomic_" + seqNum + "_" + save_speciesName + ".fasta"
 
                 # Only proceeds if file does not exist
                 if os.path.isfile(outputName_exons) != True:
 
-                    # Writing exons ... only if length greater than 200 bp 
+                    # Downloading exon/intron sequences 
                     totalSeq, exons, introns = return_exons(id)
-                    exonRecords = [SeqRecord(Seq(exon), id = geneName, description = "exon") for exon in exons if len(exon) > 200]
+                    # Generating seq record objects 
+                    exonRecords = [SeqRecord(Seq(exon), id = geneName, description = "exon") for exon in exons]
+                    intronRecords = [SeqRecord(Seq(intron), id = geneName, description = "intron") for intron in introns]
+                    # Writing fasta files 
                     SeqIO.write(exonRecords, outputName_exons, "fasta")
+                    SeqIO.write(intronRecords, outputName_introns, "fasta")
 
                     # Writing cds
                     if metric_transcript(id)[2] == 'protein_coding':
@@ -94,6 +101,10 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
                     cdnaRecords = SeqRecord(Seq(cdna), id = geneName, description = "cds")
                     SeqIO.write(cdnaRecords, outputName_cdna, "fasta")
                     
+                    # Writing cdna
+                    genomic = return_ensemblGenomic(id, speciesName)
+                    genomicRecords = SeqRecord(Seq(genomic), id = geneName, description = "genomic")
+                    SeqIO.write(genomicRecords, outputName_genomic, "fasta")
 
                 else:
                     print("Exists")
@@ -102,16 +113,20 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
                 i += 1
         else:
             outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + save_speciesName + ".fasta"
+            outputName_introns = path_species + "/" + geneName + "_introns_" + str(i) + "_" + save_speciesName + ".fasta"
             outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + save_speciesName + ".fasta"
             outputName_cdna = path_species + "/" + geneName + "_cdna_" + str(i) + "_" + save_speciesName + ".fasta"
+            outputName_genomic = path_species + "/" + geneName + "_genomic_" + str(i) + "_" + save_speciesName + ".fasta"
 
             # Only proceeds if file does not exist
             if os.path.isfile(outputName_exons) != True:
-                totalSeq, exons, introns = return_exons(ensembl_transcriptIDs)
 
-                # Writing exons ... only if length greater than 200 bp 
-                exonRecords = [SeqRecord(Seq(exon), id = geneName, description = "exon") for exon in exons if len(exon) > 200]
+                # Fetching exon/intron records 
+                totalSeq, exons, introns = return_exons(ensembl_transcriptIDs)
+                exonRecords = [SeqRecord(Seq(exon), id = geneName, description = "exon") for exon in exons]
+                intronRecords = [SeqRecord(Seq(intron), id = geneName, description = "intron") for intron in introns]
                 SeqIO.write(exonRecords, outputName_exons, "fasta")
+                SeqIO.write(intronRecords, outputName_introns, "fasta")
 
                 # Writing cds
                 if metric_transcript(ensembl_transcriptIDs)[2] == 'protein_coding':
@@ -124,6 +139,10 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
                 cdnaRecords = SeqRecord(Seq(cdna), id = geneName, description = "cds")
                 SeqIO.write(cdnaRecords, outputName_cdna, "fasta")
 
+                # Writing genomic
+                genomic = return_ensemblGenomic(ensembl_transcriptIDs, speciesName)
+                genomicRecords = SeqRecord(Seq(genomic), id = geneName, description = "genomic")
+                SeqIO.write(genomicRecords, outputName_genomic, "fasta")
                 
             else:
                 print("Exists")
@@ -246,6 +265,21 @@ def return_ensemblCDS(transcriptID, speciesName):
     
     return r.text
 
+def return_ensemblGenomic(transcriptID, speciesName):
+    """Returns sequence of CDS given transript ID"""
+    
+    server = "https://rest.ensembl.org"
+    extBase = "/sequence/id/"
+    scientificSpeciesName, taxonID = return_scientificName(speciesName) 
+    ext = extBase + transcriptID + "?" + "type=genomic;" + "species=" + scientificSpeciesName 
+    
+    r = requests.get(server+ext, headers={ "Content-Type" : "text/plain"})
+
+    if not r.ok:
+      r.raise_for_status()
+      sys.exit()
+    
+    return r.text
 
 def split_ExonsIntrons(seq):
     """Generates chunks of upper and lower case sequence letters

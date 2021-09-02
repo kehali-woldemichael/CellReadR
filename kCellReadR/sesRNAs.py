@@ -108,21 +108,29 @@ def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters, variant
     # Iterating through exons and generating sesRNAs and sequence metrics
     for i in range(len(exon_records)):
         tempSeq = exon_records[i].seq
-        temp_sesRNAs, temp_sequenceMetrics, temp_sesRNA_objs = \
-            generate_sesRNA(tempSeq, searchSequence, parameters, (i+1), variantTable)
+        # Only generating sesRNAs if length of exon greater than length of sesRNA 
+        if len(tempSeq) >= parameters.length:
+            temp_sesRNAs, temp_sequenceMetrics, temp_sesRNA_objs = \
+                generate_sesRNA(tempSeq, searchSequence, parameters, (i+1), variantTable)
 
-        # Addiing sesRNAs and cell metrics for this exon
-        all_sesRNAs.extend(temp_sesRNAs)
-        all_sesRNA_objs.extend(temp_sesRNA_objs)
-        all_sequenceMetrics = all_sequenceMetrics.append(temp_sequenceMetrics)
+            # Addiing sesRNAs and cell metrics for this exon
+            all_sesRNAs.extend(temp_sesRNAs)
+            all_sesRNA_objs.extend(temp_sesRNA_objs)
+            all_sequenceMetrics = all_sequenceMetrics.append(temp_sequenceMetrics)
+
+            i += 1
+            print(i)
+        # Skip if current exon too short to generate sesRNAs 
+        else:
+            i += 1
 
         # Printing number of passed sequences for current exon
         # print(len(temp_sesRNAs))
 
     # Creating column for number of sequence ...
     # Then moving that column to the front
-    all_sequenceMetrics['SeqNumber'] = list(range(1,(len(all_sequenceMetrics))+1))
-    col = all_sequenceMetrics.pop("SeqNumber")
+    all_sequenceMetrics['sesNum'] = list(range(1,(len(all_sequenceMetrics))+1))
+    col = all_sequenceMetrics.pop("sesNum")
     all_sequenceMetrics.insert(0, col.name, col)
 
     # Return final output
@@ -158,6 +166,8 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
     # If in exon object 
     exonTotal_Ratio = []
     exonProtein_Ratio = []
+    cdsTotal_Ratio = []
+    cdnaTotal_Ratio = []
 
     sesRNA_objs = []
 
@@ -251,9 +261,11 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
                 num_inF_ATGs.append(num_inF_ATG)
                 num_inF_Stops.append(num_inF_Stop)
 
-                tempTotal, tempProtein = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable, parameters.seqDirection)
+                tempTotal, tempProtein, tempCDS, tempCDNA = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable, parameters.seqDirection)
                 exonTotal_Ratio.append(tempTotal)
                 exonProtein_Ratio.append(tempProtein)
+                cdsTotal_Ratio.append(tempCDS)
+                cdnaTotal_Ratio.append(tempCDNA)
 
                 sesRNA_objs.append(sesRNA(subsequence, start, start+length,
                                           indices_inF_TGG[0], central_inF_TGG,
@@ -268,12 +280,14 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
 
 
-    allMetrics = {'TypeSeq': parameters.seqDirection, 'Exon':exonNumber, "ExonFrac":exonTotal_Ratio, "ExonProtFrac": exonProtein_Ratio, 
+    allMetrics = {'TypeSeq': parameters.seqDirection, 'SeqNum':exonNumber, 
+                  "ExonFrac":exonTotal_Ratio, "ExonProtFrac": exonProtein_Ratio, 
+                  "CDSFrac":cdsTotal_Ratio, "CDNAFrac":cdnaTotal_Ratio, 
                   'StartSeq':startSeq, 'StopSeq':stopSeq,
                   'firstTGG': first_TGGs, 'centralTGG': most_centralTGGs,
                   'second_cTGG': second_centralTGGs,
                   'numTGG':num_inF_TGGs, 
-                  "numTTGG": num_inF_TTGG, "numTGGA": num_inF_TGGA, "numTTGGA": num_inF_TTGGA, 
+                  "numTTGG": num_inF_TTGGs, "numTGGA": num_inF_TGGAs, "numTTGGA": num_inF_TTGGAs, 
                   'numATG':num_inF_ATGs,
                   'numStop':num_inF_Stops, 'gcCont':gcContents}
     sequenceMetrics = pd.DataFrame(allMetrics)
