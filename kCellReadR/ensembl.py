@@ -17,7 +17,7 @@ import jsons
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord 
 from Bio import SeqIO
-
+ 
 
 def json_output_spliceVariants():
     '''Ouputs pandas.DataFrame as json ... for node.js Express server
@@ -30,7 +30,6 @@ def json_output_spliceVariants():
     ensembl_transcriptIDs = return_ensemblTranscriptIDs(speciesName, geneName)
     # Generating transcript splice variant metrics 
     transcriptMetrics = table_transcriptsInfo(ensembl_transcriptIDs)
-    # Generating pd.Dataframe
     df = pd.DataFrame(transcriptMetrics)
 
     # Converting DataFrame to json and dumping it to std.out
@@ -66,17 +65,15 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
         path_species = path_outputEnsembl + "/" + save_speciesName
         pathlib.Path(path_species).mkdir(parents=True, exist_ok=True)
 
-        i = 1
 
         # Had to split up ... when only one splice variant returns str ... otherwise returns list
         if type(ensembl_transcriptIDs) != str:
-            for id in ensembl_transcriptIDs:
-                seqNum = str(i)
-                outputName_exons = path_species + "/" + geneName + "_exons_" + seqNum + "_" + save_speciesName + ".fasta"
-                outputName_introns = path_species + "/" + geneName + "_introns_" + seqNum + "_" + save_speciesName + ".fasta"
-                outputName_cds = path_species + "/" + geneName + "_cds_" + seqNum + "_" + save_speciesName + ".fasta"
-                outputName_cdna = path_species + "/" + geneName + "_cdna_" + seqNum + "_" + save_speciesName + ".fasta"
-                outputName_genomic = path_species + "/" + geneName + "_genomic_" + seqNum + "_" + save_speciesName + ".fasta"
+            for i, id in enumerate(ensembl_transcriptIDs, start = 1):
+                outputName_exons = f"{path_species}/{geneName}_exons-{str(i)}_{save_speciesName}.fasta"
+                outputName_introns = f"{path_species}/{geneName}_introns-{str(i)}_{save_speciesName}.fasta"
+                outputName_cds = f"{path_species}/{geneName}_cds-{str(i)}_{save_speciesName}.fasta"
+                outputName_cdna = f"{path_species}/{geneName}_cdna-{str(i)}_{save_speciesName}.fasta"
+                outputName_genomic = f"{path_species}/{geneName}_genomic-{str(i)}_{save_speciesName}.fasta"
 
                 # Only proceeds if file does not exist
                 if os.path.isfile(outputName_exons) != True:
@@ -108,15 +105,12 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
 
                 else:
                     print("Exists")
-
-                
-                i += 1
         else:
-            outputName_exons = path_species + "/" + geneName + "_exons_" + str(i) + "_" + save_speciesName + ".fasta"
-            outputName_introns = path_species + "/" + geneName + "_introns_" + str(i) + "_" + save_speciesName + ".fasta"
-            outputName_cds = path_species + "/" + geneName + "_cds_" + str(i) + "_" + save_speciesName + ".fasta"
-            outputName_cdna = path_species + "/" + geneName + "_cdna_" + str(i) + "_" + save_speciesName + ".fasta"
-            outputName_genomic = path_species + "/" + geneName + "_genomic_" + str(i) + "_" + save_speciesName + ".fasta"
+            outputName_exons = f"{path_species}/{geneName}_exons-1_{save_speciesName}.fasta"
+            outputName_introns = f"{path_species}/{geneName}_introns-1_{save_speciesName}.fasta"
+            outputName_cds = f"{path_species}/{geneName}_cds-1_{save_speciesName}.fasta"
+            outputName_cdna = f"{path_species}/{geneName}_cdna-1_{save_speciesName}.fasta"
+            outputName_genomic = f"{path_species}/{geneName}_genomic-1_{save_speciesName}.fasta"
 
             # Only proceeds if file does not exist
             if os.path.isfile(outputName_exons) != True:
@@ -150,7 +144,7 @@ def download_ensemblSequences(speciesName = 'noSpecies', geneName = 'noGene'):
     
 def metric_transcript(transcriptID):
     """Returns information on transcript"""
-    server = "https://rest.ensembl.org"
+    server = "https://rest.ensembl.org" 
     ext = "/lookup/id/" + transcriptID + "?expand=1"
     
     r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
@@ -170,23 +164,21 @@ def table_transcriptsInfo(ensembl_transcriptIDs):
 
     transcriptInfo = [] 
 
-    i = 1
     if type(ensembl_transcriptIDs) != str:
-        for transcript in ensembl_transcriptIDs:
+        for i, transcript in enumerate(ensembl_transcriptIDs, start = 1):
             temp_transcriptInfo = []
             temp_transcriptInfo.append(i)
             temp_transcriptInfo.append(transcript)
             temp_transcriptInfo.extend(metric_transcript(transcript))
 
             transcriptInfo.append(temp_transcriptInfo)
-            i += 1
 
         transcriptMetrics = \
                 pd.DataFrame(transcriptInfo, columns = 
                         ['TranscriptNum', 'TranscriptID', 'TranscriptName', 'Assembly', 'Type', 'AA_Length', 'Is_Canonical'])
     else:
         temp_transcriptInfo = []
-        temp_transcriptInfo.append(i)
+        temp_transcriptInfo.append(1)
         temp_transcriptInfo.append(ensembl_transcriptIDs)
         temp_transcriptInfo.extend(metric_transcript(ensembl_transcriptIDs))
 
@@ -206,6 +198,7 @@ def return_ensemblTranscriptIDs(species, geneSymbol):
     supportedSpecies = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish', 'thale-cress', 'frog', 'pig']
 
     # Makes sure that in supported short species names 
+    # Otherwise much use taxon id
     if species.lower() in supportedSpecies:
         mg = mygene.MyGeneInfo()
         symbolSearch = 'symbol:' + geneSymbol 
@@ -217,7 +210,6 @@ def return_ensemblTranscriptIDs(species, geneSymbol):
         else:
             tempID = tempID_search[0]['_id']
             return mg.getgene(tempID, fields = 'ensembl')['ensembl']['transcript']
-    # Otherwise much use taxon id
     else:
         scientificSpeciesName, taxonID = return_scientificName(species) 
             

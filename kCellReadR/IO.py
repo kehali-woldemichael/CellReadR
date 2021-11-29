@@ -4,16 +4,15 @@ from Bio.Seq import Seq
 # For creating SeqRecord objects
 from Bio.SeqRecord import SeqRecord
 
-# For calling cmd fuctions
+# For calling cli fuctions
 import subprocess
 # For saving sesRNAs 
 from datetime import datetime
 # For checiking if reference sequecnes exist
 import os
-from kCellReadR.sequence import *
-
 
 # Importing paths
+from kCellReadR.sequence import *
 from kCellReadR.paths import *
 from kCellReadR.ensembl import *
 
@@ -24,9 +23,9 @@ def load_referenceSequences(species, geneName, spliceVariant):
     spliceVariant = str(spliceVariant)
     save_speciesName = species.replace(" ", "_")
     # Base path for sequences for gene 
-    gene_BasePath = ensembl_BasePath + '/' + save_speciesName + '/' + geneName 
+    gene_BasePath = f"{ensembl_BasePath}/{save_speciesName}/{geneName}"
     # Path at which to check if sequences downloaded alread 
-    test_BasePath = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    test_BasePath = f"{gene_BasePath}_exons-{spliceVariant}_{save_speciesName}.fasta"
     # Only run if sequences not already downloaded 
     # print('Downloading' + test_BasePath)
     if os.path.isfile(test_BasePath) == False:
@@ -35,22 +34,28 @@ def load_referenceSequences(species, geneName, spliceVariant):
         # print('Downloaded')
 
     # Loading exons file 
-    exon_fileName = gene_BasePath + '_exons_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    exon_fileName = f"{gene_BasePath}_exons-{spliceVariant}_{save_speciesName}.fasta"
     exon_records = list(SeqIO.parse(exon_fileName, "fasta"))
     rC_exon_records, C_exon_records = return_Complements(exon_records)
 
+    # Loading introns file 
+    intron_fileName = f"{gene_BasePath}_introns-{spliceVariant}_{save_speciesName}.fasta"
+    intron_records = list(SeqIO.parse(intron_fileName, "fasta"))
+    rC_intron_records, C_intron_records = return_Complements(intron_records)
+
     # Loading sequences for gene CDS
-    CDS_fileName = gene_BasePath + '_cds_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    CDS_fileName = f"{gene_BasePath}_cds-{spliceVariant}_{save_speciesName}.fasta"
     CDS = list(SeqIO.parse(CDS_fileName, "fasta"))
 
     # Loading sequences for gene CDS
-    cDNA_fileName = gene_BasePath + '_cdna_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    cDNA_fileName = f"{gene_BasePath}_cdna-{spliceVariant}_{save_speciesName}.fasta"
     cDNA = list(SeqIO.parse(cDNA_fileName, "fasta"))
 
     # Loading sequences for gene genomic 
-    genomic_fileName = gene_BasePath + '_genomic_' + spliceVariant + '_' + save_speciesName + '.fasta'
+    genomic_fileName = f"{gene_BasePath}_genomic-{spliceVariant}_{save_speciesName}.fasta"
     genomic = list(SeqIO.parse(genomic_fileName, "fasta"))
-    return rC_exon_records, C_exon_records, CDS, cDNA, genomic
+
+    return rC_exon_records, rC_intron_records, CDS, cDNA, genomic
     
 
 def seq_returnEntrez(sequenceID, retType):
@@ -98,8 +103,8 @@ def save_all_sesRNAs_DNA(sesRNAs, species, gene):
     pathlib.Path(savePath).mkdir(parents=True, exist_ok=True)
 
     # Generate SeqRecord object for each sequence and append to list 
-    outputID = gene + '_sesRNA_'
-    outputDescription = "sesRNA for " + gene
+    outputID = f"{gene}_sesRNA_"
+    outputDescription = f"sesRNA for {gene}"
 
     # Generating sequence record objects (for seperate storage)
     outputSeqMulti = []
@@ -109,7 +114,8 @@ def save_all_sesRNAs_DNA(sesRNAs, species, gene):
         n += 1
 
     # Write output fasta files 
-    saveBase = savePath + species.replace(' ', '_') + '_' + gene + '_sesRNAs_' 
-    saveName = saveBase + datetime.now().strftime("%d-%m-%Y_%H-%M-%S") + '.fasta'
+    saveBase = f"{savePath}{species.replace(' ', '_')}_{gene}_sesRNAs_"
+    now = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    saveName = f"{saveBase}{now}.fasta"
     with open(saveName, "w") as output_handle:
         SeqIO.write(outputSeqMulti, output_handle, "fasta")

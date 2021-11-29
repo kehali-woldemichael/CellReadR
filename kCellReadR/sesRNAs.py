@@ -23,22 +23,25 @@ class sesRNA():
 
 class parameters_sesRNA:
     """Class for storing paramaters"""
-    def __init__(self, species, gene, spliceVariant, seqDirection, length,
+    def __init__(self, species, gene, spliceVariant, length,
                  num_inF_TGG, num_inF_Stop, inF_ATG,
                  minGC, maxGC, nearCenter, fromStop):
         self.species = species
         self.gene = gene
         self.spliceVariant = spliceVariant
 
-        self.seqDirection = seqDirection
-
         self.length = length
+        # Limit on number of in frame TGG's 
         self.num_inF_TGG = num_inF_TGG
+        # Limit on number of in frame STOP codons (TAG, TGA, TAA) 
         self.num_inF_Stop = num_inF_Stop
+        # Limit of number of in frame start codons (ATG) 
         self.inF_ATG = inF_ATG
         self.minGC = minGC
         self.maxGC = maxGC
+        # Distance of most central TGG from center 
         self.nearCenter = nearCenter
+        # Distance of most central TGG from any STOP
         self.fromStop = fromStop
 
     def print_parameters(self):
@@ -46,55 +49,25 @@ class parameters_sesRNA:
         for attribute, value in self.__dict__.items():
             print(attribute, '=', value)
 
-def return_inSearchSeq(sesRNAs, searchSeq, seqDirection):
-    """Return sesRNAs that are in CDS"""
+def return_inSearchSeq(sesRNAs, searchSeq):
+    """Return sesRNAs that are in given target sequence"""
     temp_cds_sesRNAs = []
 
     for sesRNA in sesRNAs:
-        if seqDirection == 'Reverse':
-            if 0 != searchSeq[0].seq.count(Seq(sesRNA).reverse_complement()):
-                temp_cds_sesRNAs.append(sesRNA)
-        elif seqDirection == 'Complement':
-            if 0 != searchSeq[0].seq.count(Seq(sesRNA).complement()):
-                temp_cds_sesRNAs.append(sesRNA)
+        if 0 != searchSeq[0].seq.count(Seq(sesRNA).reverse_complement()):
+            temp_cds_sesRNAs.append(sesRNA)
 
     return temp_cds_sesRNAs
 
-def generate_all_sesRNAs(rC_Seq, C_Seq, searchSequence, parameters, variantTable):
-    """Functoion for generating sesRNAs for both complement and reverse
-    :rC_Seq: TODO
-    :C_Seq: TODO
+def generate_all_sesRNAs(target, searchSequence, parameters, variantTable):
+    """Function for generating sesRNAs for both complement and reverse
+    :rC_Seq: reverse compelement of 
     :parameters: TODO
     :returns: TODO
     """
-
-    if parameters.seqDirection == 'Reverse':
-        rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
-            generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters, variantTable)
-        return rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs
-    elif parameters.seqDirection == 'Complement':
-        C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs = \
-            generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters, variantTable)
-        return C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs
-    elif parameters.seqDirection == 'Both':
-        all_sesRNAs = []
-        all_sesRNA_objs = []
-
-        parameters.seqDirection = 'Reverse'
-        rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
-            generate_sesRNAs_multiExon(rC_Seq, searchSequence, parameters, variantTable)
-        all_sesRNAs.extend(rC_sesRNAs)
-        all_sesRNA_objs.extend(rC_sesRNA_objs)
-
-        parameters.seqDirection = 'Complement'
-        C_sesRNAs, C_sequenceMetrics, C_sesRNA_objs = \
-            generate_sesRNAs_multiExon(C_Seq, searchSequence, parameters, variantTable)
-        all_sesRNAs.extend(C_sesRNAs)
-        all_sesRNA_objs.extend(C_sesRNA_objs)
-
-        all_sequenceMetrics = \
-            pd.concat([rC_sequenceMetrics, C_sequenceMetrics])
-        return all_sesRNAs, all_sequenceMetrics, all_sesRNA_objs
+    rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs = \
+        generate_sesRNAs_multiExon(target, searchSequence, parameters, variantTable)
+    return rC_sesRNAs, rC_sequenceMetrics, rC_sesRNA_objs
 
 
 def generate_sesRNAs_multiExon(exon_records, searchSequence, parameters, variantTable):
@@ -237,8 +210,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
         if(cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7):
             # Only include if in region of gene (currently in CDS)
-            if check_inSearchSeq(subsequence, searchSequence,
-                           parameters.seqDirection):
+            if check_inSearchSeq(subsequence, searchSequence):
 
                 # Appending passesed subsequences
                 sesSeq.append(subsequence)
@@ -261,7 +233,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
                 num_inF_ATGs.append(num_inF_ATG)
                 num_inF_Stops.append(num_inF_Stop)
 
-                tempTotal, tempProtein, tempCDS, tempCDNA = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable, parameters.seqDirection)
+                tempTotal, tempProtein, tempCDS, tempCDNA = check_inExonVariants(subsequence, parameters.species, parameters.gene, variantTable)
                 exonTotal_Ratio.append(tempTotal)
                 exonProtein_Ratio.append(tempProtein)
                 cdsTotal_Ratio.append(tempCDS)
@@ -280,7 +252,7 @@ def generate_sesRNA(sequence, searchSequence, parameters, exonNumber, variantTab
 
 
 
-    allMetrics = {'TypeSeq': parameters.seqDirection, 'SeqNum':exonNumber, 
+    allMetrics = {'SeqNum':exonNumber, 
                   "ExonFrac":exonTotal_Ratio, "ExonProtFrac": exonProtein_Ratio, 
                   "CDSFrac":cdsTotal_Ratio, "CDNAFrac":cdnaTotal_Ratio, 
                   'StartSeq':startSeq, 'StopSeq':stopSeq,

@@ -1,0 +1,3 @@
+TranscriptNum,TranscriptID,TranscriptName,Assembly,Type,AA_Length,Is_Canonical
+1,ENST00000356613,ARC-201,GRCh38,protein_coding,396,True
+2,ENST00000581404,ARC-202,GRCh38,processed_transcript,no protein,False

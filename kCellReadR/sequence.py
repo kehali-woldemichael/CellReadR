@@ -55,12 +55,9 @@ def return_inFrame(sequence, choice):
     if choice == 'numStop': return num_inF_Stop, indiciesStop
 
 # Return sesRNAs that are in CDS
-def check_inSearchSeq(sequence, searchSequence, typeSes):
-    if typeSes == 'Reverse':
-        return 0 != \
-            searchSequence[0].seq.count(sequence.reverse_complement())
-    elif typeSes == 'Complement':
-        return 0 != searchSequence[0].seq.count(sequence.complement())
+def check_inSearchSeq(sequence, searchSequence):
+    return 0 != \
+        searchSequence[0].seq.count(sequence.reverse_complement())
 
 def check_cORF(sequence):
     """Checks if continuous open reading frame by translating to stop ..."""
@@ -80,12 +77,14 @@ def return_Complements(seqRecords):
         return seqRecords.reverse_complement(), SeqRecord(Seq(str(seqRecords.reverse_complement().seq)[::-1]), description = 'Complement')
 
 
-def check_inExonVariants(sesRNA, speciesName, geneName, variantTable, seqDirection):
+def check_inExonVariants(sesRNA, speciesName, geneName, variantTable):
     """Function for checking if sesRNA how many of exons (checks total and only protein coding)"""
-    seqDir_Path = ensembl_BasePath + '/' + speciesName.replace(' ', '_') 
-    exonPartialPath = seqDir_Path + '/' + geneName + '_exons_'
-    cdsPartialPath = seqDir_Path + '/' + geneName + '_cds_'
-    cdnaPartialPath = seqDir_Path + '/' + geneName + '_cdna_'
+
+    speciesName_formated = speciesName.replace(' ', '_')
+    seqDir_Path = f"{ensembl_BasePath}/{speciesName_formated}"
+    exonPartialPath = f"{seqDir_Path}/{geneName}_exons-"
+    cdsPartialPath = f"{seqDir_Path}/{geneName}_cds-"
+    cdnaPartialPath = f"{seqDir_Path}/{geneName}_cdna-"
     
     exonVariant_proteinCoding_Count = len(variantTable[variantTable == 'protein_coding'])
 
