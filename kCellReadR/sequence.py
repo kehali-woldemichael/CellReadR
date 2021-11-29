@@ -134,7 +134,7 @@ def convert_DNA(sequence, numberConvert):
     num_inF_TGG, num_inF_TTGG, num_inF_TGGA, num_inF_TTGGA, num_inF_ATG, num_inF_Stop, indices_inF_TGG, \
         indices_inF_ATG, indices_inF_Stop = \
         return_inFrame(strSeq, 'all')
-    print(num_inF_TGG)
+    # print(num_inF_TGG)
     # print(num_inF_Stop)
 
     # Replacing in frame stop codons in sequence 
@@ -147,7 +147,7 @@ def convert_DNA(sequence, numberConvert):
     # Setting number convert to all if 'All' selected as number of TGG to convert 
     if numberConvert == 'All': numberConvert = num_inF_TGG
     # Converting TGG's ... up to number set ... and in order from starting with most central 
-    # Sorts indicees by distance from center 
+    # Sorts indices by distance from center 
     sorted_indices_centralTGG = np.array(sorted(indices_inF_TGG - (len(strSeq)/2), key = abs)) + (len(strSeq)/2)
     # Converts in frame TGG's ... starting from most central TGG ... up to limit set by numberConvert 
     for i in range(numberConvert):

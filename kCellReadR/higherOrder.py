@@ -29,16 +29,16 @@ def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
         all_mfe.append(round(mfe, 3))
 
         # Making sure that single digit number stast with 0 so that files processed in order
-        if i < 10: numSes = '0' + str(i)
+        if i < 10: numSes = f"0{str(i)}"
         else: numSes = str(i)
 
         # Defining output name
-        outputName = geneName + '_' + numSes
-        outputDescription = "sesRNA #" + numSes
+        outputName = f"{geneName}_{numSes}"
+        outputDescription = f"sesRNA #{numSes}"
 
         # Writing reverse complement
         outputRecord = SeqRecord(sesRNA, id = outputName, description = outputDescription)
-        outputFull = basePath + '/Output/BioPython/Temp/' + outputName + '.fasta'
+        outputFull = f"{basePath}/Output/BioPython/Temp/{outputName}.fasta"
 
         with open(outputFull, "w") as output_handle:
             SeqIO.write(outputRecord, output_handle, "fasta")
@@ -47,7 +47,7 @@ def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
 
 def generate_RNApred(sesRNAs_DNA, sequenceMetrics, geneName, numConvert):
     # Generating Temp
-    tempPath = basePath + 'Output/BioPython/Temp'
+    tempPath = f"{basePath}Output/BioPython/Temp"
     # Creating directory for temp output if does not exist
     pathlib.Path(tempPath).mkdir(parents=True, exist_ok=True)
 
@@ -59,8 +59,7 @@ def generate_RNApred(sesRNAs_DNA, sequenceMetrics, geneName, numConvert):
         sesRNAs_RNA = return_converted_sesRNA_RNA(sesRNAs_DNA, numConvert)
 
     # Just making sure to clear Temp folder before starting
-    removeCommand = 'rm -rf ' + tempPath + '/*'
-    os.system('rm -rf ')
+    os.system(f"rm -rf {tempPath}/*")
 
     # Creating temporary fasta files of sesRNAs (RNA)
     all_mfe = output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics)
@@ -111,7 +110,7 @@ def generate_mfeProb(sequenceMetrics, geneName, species, spliceVariant):
     # sorting files in output of scandir 
     for entry in sorted(os.scandir(pathTemp), key=lambda e: e.name):
         # Defining command for RNAfold 
-        commandFold = 'RNAfold -p -d2 --noLP < ' + entry.path + ' > ' + pathOutTempFold    
+        commandFold = f"RNAfold -p -d2 --noLP < {entry.path} > {pathOutTempFold}"    
         # Generating RNAfold predictions 
         generateProb = subprocess.run(commandFold, shell=True, stdout=subprocess.PIPE)
         
@@ -160,7 +159,7 @@ def output_RIblast(sequenceMetrics, geneName, testSpecies, spliceVariant, target
 
     spliceVariant = str(spliceVariant)
     save_test_speciesName = testSpecies.replace(" ", "_")
-    gene_BasePath = ensembl_BasePath + '/' + save_test_speciesName + '/' + geneName 
+    gene_BasePath = f"{ensembl_BasePath}/{save_test_speciesName}/{geneName}"
     
     # Paths to fasta files for test sequence ... depending on given type
     if targetName == 'CDS':
@@ -217,7 +216,6 @@ def output_RIblast(sequenceMetrics, geneName, testSpecies, spliceVariant, target
     
     # Clear RIblast Temp directory 
     os.system(f"rm -rf {path_tempRIblast}*")
-    
 
     # Adding RNA-RNA binding statistics for most favorable interaction to rest of sequence metrics table
     metricsTable_higherOrder = pd.concat([sequenceMetrics.reset_index(drop=True), useful_RIblast.reset_index(drop=True).iloc[:, 0:4]], axis = 1)

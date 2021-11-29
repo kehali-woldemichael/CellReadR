@@ -75,7 +75,7 @@ def convert_DNA(sequence, numberConvert):
     strSeq = str(sequence)
     # Generating in frame object variables
     num_inF_TGG, num_inF_ATG, num_inF_Stop, indicesTGG, indicesATG, indicesStop = return_inFrame(Seq(strSeq), 'all')
-    print(num_inF_TGG)
+    # print(num_inF_TGG)
     # print(num_inF_Stop)
 
     # Replacing in frame stop codons in sequence
