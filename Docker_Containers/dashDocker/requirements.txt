@@ -46,7 +46,7 @@ jupyter-client==6.1.12
 jupyter-core==4.7.1
 jupyter-dash==0.4.0
 jupyter-packaging==0.10.1
-jupyter-server==1.6.4
+jupyter-server==1.17.0
 jupyter-server-proxy==3.0.2
 jupyterlab-dash==0.1.0a3
 jupyterlab-pygments==0.1.2
