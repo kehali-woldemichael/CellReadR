@@ -18,8 +18,9 @@ from kCellReadR.sequence import *
 
 def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
     # Loading RNAfold as RNA
-    sys.path.append(pathToFold)
-    import _RNA as RNA
+    #sys.path.append(pathToFold)
+    #import _RNA as RNA
+    from ViennaRNA import RNA
 
     # Writing sequences as seperate fasta files
     all_mfe = []
@@ -47,7 +48,7 @@ def output_temp_sesRNA(sesRNAs_RNA, geneName, sequenceMetrics):
 
 def generate_RNApred(sesRNAs_DNA, sequenceMetrics, geneName, numConvert):
     # Generating Temp
-    tempPath = f"{basePath}Output/BioPython/Temp"
+    tempPath = f"{basePath}/Output/BioPython/Temp"
     # Creating directory for temp output if does not exist
     pathlib.Path(tempPath).mkdir(parents=True, exist_ok=True)
 
@@ -104,7 +105,6 @@ def generate_mfeProb(sequenceMetrics, geneName, species, spliceVariant):
     gene_BasePath = f"{ensembl_BasePath}/{save_speciesName}/{geneName}"
     CDS_fileName = f"{gene_BasePath}_cds_{spliceVariant}_{save_speciesName}.fasta"
     
-    pathTemp = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/Output/BioPython/Temp'
     pathOutTempFold = f"{pathTemp}/temp.out"
 
     # sorting files in output of scandir 
@@ -116,7 +116,8 @@ def generate_mfeProb(sequenceMetrics, geneName, species, spliceVariant):
         
         # Moving to Temp directory to work on fasta files 
         currentWD = os.getcwd()
-        os.chdir('/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/Output/BioPython/Temp')
+        #os.chdir('/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/Output/BioPython/Temp')
+        os.chdir(pathTemp)
 
         # Running script for getting probabilities from RNAfold output file (added to ArchBin btw)
         readProb = subprocess.Popen("rnaFold_prob.sh", shell=True, stdout=subprocess.PIPE)
@@ -171,7 +172,6 @@ def output_RIblast(sequenceMetrics, geneName, testSpecies, spliceVariant, target
     print(target_fileName)
     
     # Path to tempRIblast folder 
-    path_tempRIblast = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/Output/RIblast/'
     query_Name = f"{path_tempRIblast}{geneName}_db"
     
     # Generating query database 
@@ -180,8 +180,6 @@ def output_RIblast(sequenceMetrics, geneName, testSpecies, spliceVariant, target
 
     # Path and file name for output CSV 
     outputName = f"{path_tempRIblast}{geneName}.csv"
-    # Path to directory sesRNA files 
-    path_sesRNAs = '/home/user1/Dropbox/Research/Neurobiology_PhD/Huang/Projects/CellReadR/Code/Output/BioPython/Temp'
     
     # Generating pd.DataFrame for storing calculated values 
     columns_RIblast = [' Accessibility Energy', ' Hybridization Energy', ' Interaction Energy', ' BasePair', 

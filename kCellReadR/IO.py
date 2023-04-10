@@ -24,7 +24,7 @@ def load_referenceSequences(species, geneName, spliceVariant):
     save_speciesName = species.replace(" ", "_")
     # Base path for sequences for gene 
     gene_BasePath = f"{ensembl_BasePath}/{save_speciesName}/{geneName}"
-    # Path at which to check if sequences downloaded alread 
+    # Path at which to check if sequences downloaded already
     test_BasePath = f"{gene_BasePath}_exons-{spliceVariant}_{save_speciesName}.fasta"
     # Only run if sequences not already downloaded 
     # print('Downloading' + test_BasePath)
@@ -98,7 +98,7 @@ def convert_DNA(sequence, numberConvert):
     return Seq(strSeq).transcribe()
 
 def save_all_sesRNAs_DNA(sesRNAs, species, gene):
-    savePath = basePath + 'Output/sesRNAs/'
+    savePath = basePath + '/Output/sesRNAs/'
     # Generating BioPython directory if does not exist 
     pathlib.Path(savePath).mkdir(parents=True, exist_ok=True)
 
